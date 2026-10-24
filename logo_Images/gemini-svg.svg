@@ -1,0 +1,119 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1420 1060" width="100%" height="100%">
+  <defs>
+    <!-- Outer V Frame Gradient (Vibrant Orange & Burnt Red) -->
+    <linearGradient id="vOuterGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff5500" />
+      <stop offset="50%" stop-color="#ff8c00" />
+      <stop offset="100%" stop-color="#d34000" />
+    </linearGradient>
+
+    <!-- Inner V Dark Bevel Gradient (Deep Burnt Rust) -->
+    <linearGradient id="vBevelDark" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#d43500" />
+      <stop offset="55%" stop-color="#9c1f00" />
+      <stop offset="100%" stop-color="#751200" />
+    </linearGradient>
+
+    <!-- Inner V Bright Lime Core Gradient (Bright Orange & Golden-Amber) -->
+    <linearGradient id="vCoreBright" x1="0%" y1="0%" x2="80%" y2="100%">
+      <stop offset="0%" stop-color="#ffa200" />
+      <stop offset="50%" stop-color="#ff7300" />
+      <stop offset="100%" stop-color="#e64200" />
+    </linearGradient>
+
+    <!-- Outer L Frame Metallic Gradient (Unchanged Silver) -->
+    <linearGradient id="lOuterGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e8edf2" />
+      <stop offset="50%" stop-color="#b4bcc4" />
+      <stop offset="100%" stop-color="#7f8892" />
+    </linearGradient>
+
+    <!-- Inner L Base Bevel Gradient (Unchanged Dark Silver) -->
+    <linearGradient id="lBevelDark" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#c6cdd4" />
+      <stop offset="50%" stop-color="#8d96a0" />
+      <stop offset="100%" stop-color="#6e7781" />
+    </linearGradient>
+
+    <!-- Inner L Bright Highlight Facet Gradient (Unchanged Platinum) -->
+    <linearGradient id="lCoreBright" x1="15%" y1="0%" x2="85%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="35%" stop-color="#eef2f6" />
+      <stop offset="70%" stop-color="#b8c0c8" />
+      <stop offset="100%" stop-color="#dcdfe4" />
+    </linearGradient>
+
+    <!-- Lightning Bolt Outer Yellow-Orange Gradient -->
+    <linearGradient id="boltOuterGrad" x1="20%" y1="0%" x2="80%" y2="100%">
+      <stop offset="0%" stop-color="#ffdf1a" />
+      <stop offset="45%" stop-color="#ff9000" />
+      <stop offset="100%" stop-color="#ff3c00" />
+    </linearGradient>
+
+    <!-- Lightning Bolt Inner Core Fiery Orange Gradient -->
+    <linearGradient id="boltInnerGrad" x1="0%" y1="15%" x2="100%" y2="85%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="22%" stop-color="#ffd024" />
+      <stop offset="55%" stop-color="#e64600" />
+      <stop offset="100%" stop-color="#ff7b00" />
+    </linearGradient>
+  </defs>
+
+  <!-- 1. OUTER ORANGE FRAME OF "V" (WITH UPPER-RIGHT & LOWER-RIGHT SPIKES) -->
+  <polygon fill="url(#vOuterGrad)" points="
+    933,75 843,177 604,177 498,411 437,177 38,177 199,331 349,909 565,909 
+    667,669 582,904 714,609 673,610 554,892 363,892 214,322 81,194 424,194 
+    494,462 615,194 848,194
+  " />
+
+  <!-- 2. INNER 3D BEVELED "V" -->
+  <!-- Base Orange/Red-Bevel -->
+  <polygon fill="url(#vBevelDark)" points="
+    170,229 250,315 390,855 530,856 634,611 545,607 821,229 638,229 484,569 396,230
+  " />
+  <!-- Bright Orange Inner Core Facet -->
+  <polygon fill="url(#vCoreBright)" points="
+    225,255 374,255 480,652 656,255 768,255 516,596 596,600 506,816 420,816 282,304
+  " />
+  <!-- Upper-Left & Upper-Right Bevel Highlight Strips (Warm Gold Highlight) -->
+  <polygon fill="#ffa626" opacity="0.65" points="170,229 396,230 374,255 225,255" />
+  <polygon fill="#ffa626" opacity="0.65" points="638,229 821,229 768,255 656,255" />
+
+  <!-- 3. OUTER METALLIC FRAME OF "L" (WITH UPPER-LEFT & LOWER-LEFT SPIKES) -->
+  <polygon fill="url(#lOuterGrad)" points="
+    1281,177 1018,177 931,396 1016,126 900,413 958,413 1031,194 1257,195 
+    1088,697 1361,697 1295,891 800,892 865,690 661,960 814,787 776,909 
+    1308,908 1387,679 1112,678
+  " />
+
+  <!-- 4. INNER 3D BEVELED "L" -->
+  <!-- Base Metallic Shadow Bevel -->
+  <polygon fill="url(#lBevelDark)" points="
+    1057,229 995,413 1073,414 936,595 848,857 1268,857 1312,733 1038,732 1207,230
+  " />
+  <!-- Bright Metallic Inner Facet -->
+  <polygon fill="url(#lCoreBright)" points="
+    1080,258 1170,258 1000,762 1272,762 1246,826 890,826 962,604 1106,414 1026,413
+  " />
+  <!-- Specular Diagonal Sheen on "L" -->
+  <polygon fill="#ffffff" opacity="0.45" points="
+    1080,258 1170,258 1115,420 962,604 1106,414 1026,413
+  " />
+
+  <!-- 5. CENTRAL HIGH-VOLTAGE LIGHTNING BOLT -->
+  <!-- Outer Gold-Yellow Bevel -->
+  <polygon fill="url(#boltOuterGrad)" points="
+    1014,29 615,572 769,575 566,1024 1002,449 847,447
+  " />
+  <!-- Inner Fiery Orange Core Facet -->
+  <polygon fill="url(#boltInnerGrad)" points="
+    962,115 654,552 802,554 618,942 954,469 808,467
+  " />
+  <!-- Center Specular Ridge Highlight (Amber Warmth) -->
+  <polygon fill="#ffd95c" opacity="0.85" points="
+    962,115 808,467 847,447 1014,29
+  " />
+  <polygon fill="#ffffff" opacity="0.75" points="
+    845,305 742,485 785,485 872,330
+  " />
+</svg>

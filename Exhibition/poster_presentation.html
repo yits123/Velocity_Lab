@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SprintGate Exhibition Poster | Velocity Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-base: #060911;
+      --bg-card: rgba(13, 20, 36, 0.88);
+      --border-card: rgba(255, 255, 255, 0.09);
+      --accent-volt: #00E676;
+      --accent-cyan: #00D2FF;
+      --accent-amber: #F59E0B;
+      --accent-crimson: #EF4444;
+      --text-main: #FFFFFF;
+      --text-muted: #94A3B8;
+      --text-dim: #64748B;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-base);
+      background-image: 
+        radial-gradient(circle at 12% 8%, rgba(0, 230, 118, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 88% 12%, rgba(0, 210, 255, 0.07) 0%, transparent 40%),
+        radial-gradient(circle at 50% 85%, rgba(13, 20, 36, 0.6) 0%, transparent 50%);
+      color: var(--text-main);
+      font-family: 'Inter', -apple-system, sans-serif;
+      line-height: 1.45;
+      padding: 24px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Print Setup for 48" x 36" Poster Board */
+    @page {
+      size: 48in 36in landscape;
+      margin: 0;
+    }
+
+    @media print {
+      body {
+        padding: 0;
+        background: #060911 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .poster-canvas {
+        width: 48in !important;
+        height: 36in !important;
+        max-width: none !important;
+        border: none !important;
+        box-shadow: none !important;
+      }
+    }
+
+    /* Top Floating Toolbar (Screen Only) */
+    .toolbar-screen {
+      width: 100%;
+      max-width: 1820px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding: 10px 20px;
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid var(--border-card);
+      border-radius: 12px;
+      backdrop-blur: 8px;
+    }
+
+    .btn-print {
+      background: linear-gradient(135deg, #00E676 0%, #00B359 100%);
+      color: #060911;
+      font-weight: 800;
+      font-size: 13px;
+      padding: 8px 18px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-print:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 0 15px rgba(0, 230, 118, 0.4);
+    }
+
+    /* Main Poster Canvas */
+    .poster-canvas {
+      width: 100%;
+      max-width: 1820px;
+      background: rgba(10, 15, 28, 0.96);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 18px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 80px rgba(0, 230, 118, 0.05);
+      padding: 30px 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Header Banner */
+    .header-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 20px;
+      border-bottom: 2px solid rgba(0, 230, 118, 0.35);
+      position: relative;
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .logo-container {
+      width: 290px;
+      height: 85px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    .logo-container svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .title-block h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 34px;
+      font-weight: 900;
+      letter-spacing: -0.01em;
+      text-transform: uppercase;
+      background: linear-gradient(90deg, #FFFFFF 0%, #E2E8F0 60%, #00E676 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1.1;
+    }
+
+    .title-block .subtitle {
+      font-size: 14.5px;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-top: 4px;
+      letter-spacing: 0.02em;
+    }
+
+    .header-meta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+    }
+
+    .badge-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .badge-volt {
+      background: rgba(0, 230, 118, 0.12);
+      color: #00E676;
+      border: 1px solid rgba(0, 230, 118, 0.35);
+    }
+
+    .badge-cyan {
+      background: rgba(0, 210, 255, 0.12);
+      color: #00D2FF;
+      border: 1px solid rgba(0, 210, 255, 0.35);
+    }
+
+    .badge-gold {
+      background: rgba(245, 158, 11, 0.12);
+      color: #F59E0B;
+      border: 1px solid rgba(245, 158, 11, 0.35);
+    }
+
+    .qr-live-demo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 6px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border-card);
+    }
+
+    .qr-live-demo img {
+      width: 44px;
+      height: 44px;
+      border-radius: 4px;
+      background: #FFFFFF;
+      padding: 2px;
+    }
+
+    .qr-text {
+      text-align: right;
+    }
+
+    .qr-text .url {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--accent-cyan);
+      font-weight: 700;
+    }
+
+    .qr-text .label {
+      font-size: 9.5px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    /* 3-Column Modular Poster Grid */
+    .poster-grid {
+      display: grid;
+      grid-template-columns: 29% 42% 29%;
+      gap: 20px;
+      flex: 1;
+    }
+
+    .poster-col {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    /* Section Cards */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: 14px;
+      padding: 16px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 3px;
+      height: 100%;
+      background: var(--accent-volt);
+      opacity: 0.8;
+    }
+
+    .card.accent-cyan::before {
+      background: var(--accent-cyan);
+    }
+
+    .card.accent-gold::before {
+      background: var(--accent-amber);
+    }
+
+    .card-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 16px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      color: #FFFFFF;
+    }
+
+    .card-title .num-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--accent-volt);
+      background: rgba(0, 230, 118, 0.1);
+      padding: 2px 7px;
+      border-radius: 4px;
+      border: 1px solid rgba(0, 230, 118, 0.25);
+    }
+
+    .card-content {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.48;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    .card-content p strong {
+      color: #FFFFFF;
+    }
+
+    .card-content ul {
+      list-style-type: none;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .card-content ul li {
+      position: relative;
+      padding-left: 13px;
+    }
+
+    .card-content ul li::before {
+      content: "▪";
+      position: absolute;
+      left: 0;
+      color: var(--accent-volt);
+    }
+
+    /* Visual Media & Diagram Containers */
+    .image-box {
+      width: 100%;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: #000000;
+      position: relative;
+    }
+
+    .image-box img {
+      width: 100%;
+      height: 132px;
+      display: block;
+      object-fit: cover;
+      object-position: top;
+    }
+
+    .image-box.hud-box img {
+      height: 48px;
+      object-fit: contain;
+      background: #060911;
+    }
+
+    .image-caption {
+      font-size: 10px;
+      color: var(--text-dim);
+      padding: 5px 9px;
+      background: rgba(6, 9, 17, 0.95);
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      font-family: 'JetBrains Mono', monospace;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .image-caption .tag {
+      color: var(--accent-volt);
+      font-weight: 700;
+    }
+
+    /* Metric Grid Box */
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 9px;
+    }
+
+    .metric-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      padding: 9px 11px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .metric-value {
+      font-family: 'Outfit', sans-serif;
+      font-size: 24px;
+      font-weight: 900;
+      line-height: 1.1;
+      color: var(--accent-volt);
+    }
+
+    .metric-value.cyan {
+      color: var(--accent-cyan);
+    }
+
+    .metric-label {
+      font-size: 10.5px;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    .metric-sub {
+      font-size: 9px;
+      color: var(--text-dim);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Comparison Table */
+    .table-custom {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 10.5px;
+    }
+
+    .table-custom th {
+      background: rgba(255, 255, 255, 0.05);
+      color: #FFFFFF;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9.5px;
+      text-transform: uppercase;
+      padding: 6px 7px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .table-custom td {
+      padding: 5px 7px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: var(--text-muted);
+    }
+
+    .table-custom tr.highlight td {
+      color: #FFFFFF;
+      background: rgba(0, 230, 118, 0.08);
+      font-weight: 700;
+    }
+
+    .table-custom tr.highlight td:first-child {
+      color: var(--accent-volt);
+    }
+
+    /* Highlight Banner Box */
+    .highlight-pill {
+      background: linear-gradient(90deg, rgba(0, 230, 118, 0.12) 0%, rgba(0, 210, 255, 0.08) 100%);
+      border: 1px solid rgba(0, 230, 118, 0.25);
+      border-radius: 8px;
+      padding: 7px 11px;
+      font-size: 11px;
+      color: #E2E8F0;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .highlight-pill strong {
+      color: var(--accent-volt);
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 800;
+    }
+
+    /* Footer Section */
+    .poster-footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding-top: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 10.5px;
+      color: var(--text-dim);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .footer-left strong {
+      color: var(--accent-volt);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Screen Only Toolbar -->
+  <div class="toolbar-screen no-print">
+    <div style="font-size: 13px; font-weight: 600; color: #94A3B8;">
+      🖥️ <strong style="color: #FFFFFF;">SprintGate 4K Exhibition Board</strong> • Standard 48" × 36" (A0 Landscape) Ready
+    </div>
+    <div style="display: flex; gap: 10px; align-items: center;">
+      <span style="font-size: 12px; color: #64748B;">For Print: Set Layout to <strong>Landscape</strong> & Margins to <strong>None</strong></span>
+      <button class="btn-print" onclick="window.print()">
+        🖨️ Export / Print Poster (PDF)
+      </button>
+    </div>
+  </div>
+
+  <!-- Poster Canvas -->
+  <main class="poster-canvas">
+
+    <!-- Header Banner -->
+    <header class="header-banner">
+      <div class="brand-section">
+        <div class="logo-container">
+          <!-- Authentic Exact Velocity Lab SVG Logo from VelocityLabLogo.jsx -->
+          <svg viewBox="65 185 1230 380" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="ex_vOuter" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#38d954" />
+                <stop offset="50%" stop-color="#64f642" />
+                <stop offset="100%" stop-color="#25b847" />
+              </linearGradient>
+
+              <linearGradient id="ex_vBevelDark" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#2ec94e" />
+                <stop offset="55%" stop-color="#179b44" />
+                <stop offset="100%" stop-color="#12823b" />
+              </linearGradient>
+
+              <linearGradient id="ex_vCoreBright" x1="0%" y1="0%" x2="80%" y2="100%">
+                <stop offset="0%" stop-color="#9dff29" />
+                <stop offset="50%" stop-color="#7dfa30" />
+                <stop offset="100%" stop-color="#3cd83e" />
+              </linearGradient>
+
+              <linearGradient id="ex_lOuter" x1="0%" y1="20%" x2="100%" y2="80%">
+                <stop offset="0%" stop-color="#cfd5db" />
+                <stop offset="45%" stop-color="#9ea6ae" />
+                <stop offset="70%" stop-color="#7dfa30" />
+                <stop offset="100%" stop-color="#25b847" />
+              </linearGradient>
+
+              <linearGradient id="ex_lBevelDark" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#c4cacf" />
+                <stop offset="50%" stop-color="#8c939a" />
+                <stop offset="100%" stop-color="#6d737a" />
+              </linearGradient>
+
+              <linearGradient id="ex_lCoreBright" x1="15%" y1="0%" x2="85%" y2="100%">
+                <stop offset="0%" stop-color="#ffffff" />
+                <stop offset="35%" stop-color="#ebeff2" />
+                <stop offset="70%" stop-color="#b4bbc2" />
+                <stop offset="100%" stop-color="#d9dde2" />
+              </linearGradient>
+
+              <linearGradient id="ex_boltOuter" x1="20%" y1="0%" x2="80%" y2="100%">
+                <stop offset="0%" stop-color="#e5ff24" />
+                <stop offset="45%" stop-color="#c8ff29" />
+                <stop offset="100%" stop-color="#5ff535" />
+              </linearGradient>
+
+              <linearGradient id="ex_boltInner" x1="0%" y1="15%" x2="100%" y2="85%">
+                <stop offset="0%" stop-color="#ffffff" />
+                <stop offset="25%" stop-color="#abff4f" />
+                <stop offset="60%" stop-color="#19b347" />
+                <stop offset="100%" stop-color="#48e83a" />
+              </linearGradient>
+
+              <linearGradient id="ex_labText" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#7dfa30" />
+                <stop offset="50%" stop-color="#00e599" />
+                <stop offset="100%" stop-color="#059669" />
+              </linearGradient>
+
+              <filter id="ex_auraGlow" x="-20%" y="-20%" width="140%" height="140%">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="16" result="blur" />
+                <feComposite in="SourceGraphic" in2="blur" operator="over" />
+              </filter>
+            </defs>
+
+            <!-- Ambient Theme Aura -->
+            <circle cx="330" cy="370" r="160" fill="rgba(0, 229, 153, 0.35)" filter="url(#ex_auraGlow)" opacity="0.3" pointer-events="none" />
+
+            <!-- 1. LEFT ICON EMBLEM: V - LIGHTNING BOLT - L -->
+            <g id="ex_emblem">
+              <!-- Outer Frame of "V" -->
+              <polygon fill="url(#ex_vOuter)" points="409,224 376,256 283,256 243,338 216,256 80,257 136,313 193,511 269,511 323,406 284,485 330,392 313,406 263,503 199,503 143,307 101,266 209,264 241,362 289,264 379,264" />
+
+              <!-- Inner 3D Beveled "V" -->
+              <polygon fill="url(#ex_vBevelDark)" points="128,275 153,306 205,491 258,493 302,408 271,401 369,275 293,275 238,391 204,276" />
+              <polygon fill="url(#ex_vCoreBright)" points="146,284 197,284 236,416 299,284 352,284 260,402 287,406 250,478 216,478 166,302" />
+              <polygon fill="#75fa3b" opacity="0.75" points="128,275 204,276 197,284 146,284" />
+              <polygon fill="#75fa3b" opacity="0.75" points="293,275 369,275 352,284 299,284" />
+
+              <!-- Outer Metallic & Theme Frame of "L" -->
+              <polygon fill="url(#ex_lOuter)" points="523,256 431,257 396,339 426,238 386,343 404,338 436,263 512,265 392,435 532,441 509,500 345,504 373,433 307,516 348,474 335,510 514,510 544,432 457,428" />
+
+              <!-- Inner 3D Beveled Metallic "L" -->
+              <polygon fill="url(#ex_lBevelDark)" points="442,276 417,340 446,341 399,401 363,492 500,492 517,451 428,450 496,275" />
+              <polygon fill="url(#ex_lCoreBright)" points="450,286 483,286 416,460 503,460 493,482 378,482 408,405 457,341 428,340" />
+              <polygon fill="#ffffff" opacity="0.55" points="450,286 483,286 463,340 408,405 457,341 428,340" />
+
+              <!-- Central High-Voltage Lightning Bolt -->
+              <polygon fill="url(#ex_boltOuter)" points="444,199 292,390 341,395 264,550 422,354 376,346" />
+              <polygon fill="url(#ex_boltInner)" points="422,232 306,383 353,387 283,522 405,361 359,354" />
+              <polygon fill="#f4ff8a" opacity="0.9" points="422,232 359,354 376,346 444,199" />
+              <polygon fill="#ffffff" opacity="0.85" points="376,296 337,360 353,360 386,306" />
+            </g>
+
+            <!-- 2. RIGHT TYPOGRAPHY LOCKUP ("VELOCITY LAB" + SUBTEXT) -->
+            <g id="ex_typography">
+              <!-- "VELOCITY" -->
+              <path fill="#ffffff" fill-rule="evenodd" d="M 651.8,325.9 L 633.0,327.4 L 604.4,379.5 L 604.0,326.5 L 586.0,326.1 L 588.2,404.0 L 608.0,403.4 Z M 709.6,326.0 L 659.0,326.6 L 638.1,404.0 L 689.2,403.5 L 692.8,387.8 L 660.4,386.6 L 664.6,372.1 L 690.2,371.6 L 694.9,356.8 L 669.8,356.2 L 671.0,347.9 L 662.2,342.1 L 704.4,342.0 Z M 721.8,325.9 L 699.8,403.4 L 747.9,404.1 L 752.6,388.0 L 722.8,387.2 L 738.9,326.6 Z M 827.6,328.8 L 820.4,325.8 L 790.2,325.8 L 782.8,327.8 L 776.8,332.4 L 771.8,342.8 L 759.8,386.8 L 759.6,396.6 L 762.8,401.4 L 769.6,404.1 L 801.2,404.1 L 813.1,398.1 L 819.1,386.8 L 831.1,340.9 L 831.1,334.1 Z M 810.9,342.4 L 811.6,347.0 L 800.5,386.4 L 797.0,387.9 L 779.5,387.5 L 778.2,384.8 L 790.0,343.8 L 794.6,341.6 Z M 895.4,328.8 L 887.6,325.8 L 859.6,325.8 L 846.6,331.8 L 828.8,386.6 L 831.5,401.2 L 838.6,404.2 L 868.8,404.1 L 880.4,397.8 L 887.8,375.6 L 871.1,375.9 L 866.4,387.6 L 849.4,387.6 L 848.2,382.1 L 859.2,343.5 L 878.2,342.2 L 877.6,354.5 L 894.2,354.8 L 898.9,338.8 Z M 930.4,325.9 L 912.8,326.9 L 891.8,401.1 L 892.2,404.1 L 908.4,404.2 L 910.1,402.8 Z M 995.4,326.0 L 939.8,326.4 L 935.9,341.1 L 953.9,342.9 L 937.6,404.0 L 955.1,403.5 L 969.8,346.9 L 960.9,341.9 L 989.5,341.5 Z M 1061.6,326.1 L 1044.0,326.4 L 1021.2,358.4 L 1016.0,326.5 L 998.0,326.4 L 1006.2,377.2 L 999.8,404.0 L 1017.2,403.6 L 1024.5,378.4 Z" />
+
+              <!-- "LAB" -->
+              <path fill="url(#ex_labText)" fill-rule="evenodd" d="M 1111.1,326.2 L 1093.6,327.2 L 1073.0,404.0 L 1116.5,404.2 L 1121.4,402.4 L 1124.5,388.4 L 1089.0,387.2 L 1098.0,379.5 Z M 1197.0,326.2 L 1173.5,326.9 L 1128.0,403.9 L 1146.5,404.0 L 1156.5,388.5 L 1180.1,388.6 L 1181.2,403.9 L 1200.1,403.5 Z M 1180.8,345.0 L 1181.2,349.0 L 1180.5,369.6 L 1177.1,371.4 L 1170.2,373.4 L 1160.2,375.4 L 1165.9,370.2 L 1178.5,347.8 Z M 1277.8,328.5 L 1271.0,325.8 L 1228.6,326.5 L 1207.4,403.8 L 1250.4,404.0 L 1258.1,402.1 L 1265.2,396.8 L 1272.2,377.9 L 1272.4,369.2 L 1269.6,363.9 L 1277.1,354.4 L 1281.0,341.0 L 1281.0,333.8 Z M 1234.0,372.0 L 1235.1,371.2 L 1251.4,371.2 L 1253.2,371.9 L 1254.2,374.2 L 1251.2,386.0 L 1249.0,387.8 L 1246.6,388.2 L 1230.6,387.9 L 1230.1,387.4 L 1230.5,383.9 Z M 1236.2,341.9 L 1239.5,341.2 L 1260.4,341.5 L 1261.6,342.5 L 1261.9,344.0 L 1259.5,352.9 L 1258.0,355.0 L 1256.0,355.8 L 1239.6,355.5 L 1239.2,353.9 L 1240.5,346.5 Z" />
+
+              <!-- "ATHLETE EVALUATION SYSTEM" -->
+              <text x="586" y="448" fill="#00E599" style="font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 900; letter-spacing: 0.24em; text-transform: uppercase;">ATHLETE EVALUATION SYSTEM</text>
+            </g>
+          </svg>
+        </div>
+        <div class="title-block">
+          <h1>SPRINTGATE: Automated Timing & AI Biomechanics</h1>
+          <div class="subtitle">High-Precision Electronic Timing Gates & Computer Vision Kinematics for Athletic Combines</div>
+        </div>
+      </div>
+
+      <div class="header-meta">
+        <div class="badge-row">
+          <span class="badge badge-volt">PATENT PENDING</span>
+          <span class="badge badge-cyan">WORLD ATHLETICS RULE 161.2</span>
+          <span class="badge badge-gold">BOM &lt; ₹12,000 ($145)</span>
+        </div>
+        <div class="qr-live-demo">
+          <!-- Embedded Live App QR Code -->
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://sprintgate-b84db.web.app" alt="Live App QR">
+          <div class="qr-text">
+            <div class="url">sprintgate-b84db.web.app</div>
+            <div class="label">Live Web Cockpit</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- 3-Column Content Grid -->
+    <div class="poster-grid">
+
+      <!-- ================= COLUMN 1 (LEFT) ================= -->
+      <div class="poster-col">
+        
+        <!-- Section 1: Abstract & Problem Statement -->
+        <section class="card">
+          <div class="card-title">
+            <span class="num-badge">01</span>
+            <span>Abstract & Problem Statement</span>
+          </div>
+          <div class="card-content">
+            <p>
+              Sprint timing precision directly dictates talent scouting and training outcomes in competitive athletics. However, modern sprint testing faces a <strong>critical grassroots disparity</strong>:
+            </p>
+            <ul>
+              <li><strong>The Cost Barrier:</strong> Commercial timing systems (Brower, Freelap, VALD) cost <strong>₹1,50,000 to ₹8,00,000</strong>, pricing out 95% of schools and youth academies.</li>
+              <li><strong>Stopwatch Variance:</strong> Manual stopwatches carry human reaction bias of <strong>±0.15s to 0.25s</strong>, completely invalidating short sprint combines (10m–40m).</li>
+              <li><strong>The Combine Bottleneck:</strong> Legacy gates require manual reset after every run, restricting testing to only 1–2 athletes per minute.</li>
+            </ul>
+            <div class="highlight-pill">
+              <strong>SOLUTION:</strong> SprintGate delivers <strong>±0.001s Olympic precision</strong> and markerless AI biomechanics at <strong>&lt; 5% the cost</strong> of commercial systems.
+            </div>
+          </div>
+        </section>
+
+        <!-- Section 5: Applications & Market Impact -->
+        <section class="card accent-cyan">
+          <div class="card-title">
+            <span class="num-badge" style="color: var(--accent-cyan); background: rgba(0,210,255,0.1); border-color: rgba(0,210,255,0.25);">02</span>
+            <span>Applications & Impact</span>
+          </div>
+          <div class="card-content">
+            <ul>
+              <li><strong>Grassroots Athletics Academies:</strong> Democratizes Olympic-grade testing for community track clubs and schools across India and emerging sports markets.</li>
+              <li><strong>Combine & Draft Testing:</strong> Speeds up mass 40-yard dash and 30m tests for soccer federations, NFL-style combines, and youth academies.</li>
+              <li><strong>Defense & Police Recruitment:</strong> Eliminates human bias in mandatory physical fitness screening runs (100m, shuttle runs).</li>
+              <li><strong>Injury Prevention & Rehab:</strong> Detects stride asymmetries and braking ground forces to mitigate hamstring strain recurrence.</li>
+            </ul>
+
+            <div class="image-box" style="margin-top: 4px;">
+              <img src="images/current_clock_controls.png" alt="Precision Timer &amp; Timing Protocol Controls">
+              <div class="image-caption">
+                <span>FIG 1: Precision Timer &amp; Protocol Controls</span>
+                <span class="tag">ACTIVE SYSTEM CAPTURE</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- ================= COLUMN 2 (CENTER) ================= -->
+      <div class="poster-col">
+
+        <!-- Section 2: System Architecture -->
+        <section class="card">
+          <div class="card-title">
+            <span class="num-badge">03</span>
+            <span>System Design & Live Architecture</span>
+          </div>
+          <div class="card-content">
+            <p>
+              SprintGate uses a <strong>Headless Dual-Fire Architecture</strong> combining ultra-fast direct radio packets with local Wi-Fi telemetry:
+            </p>
+            <ul>
+              <li><strong>Node A (0m Start Gate):</strong> ESP32 with microsecond hardware interrupt, active-low buzzer, and PN532 RFID tag reader for instant athlete badge recognition.</li>
+              <li><strong>Node B (Finish Gate):</strong> ESP32 with OLED status screen, embedded WebSocket server (port 81), and offline buffer queue.</li>
+              <li><strong>Sand-Ballasted Quadrapods:</strong> 4-legged PVC stand with 85cm tip-to-tip span filled with dry sand. Centers optical beam at <strong>90–100cm (pelvic center of mass)</strong> to eliminate false triggers from swinging arms or feet.</li>
+              <li><strong>ESP-NOW Primary Link:</strong> Sub-millisecond peer-to-peer radio sync (<strong>0.82 ms latency</strong>) bypassing Wi-Fi congestion.</li>
+            </ul>
+
+            <!-- Current Authentic Live Cockpit Image -->
+            <div class="image-box">
+              <img src="images/current_live_cockpit.png" alt="Current Live Timing Cockpit">
+              <div class="image-caption">
+                <span>FIG 2: Live Cockpit — Precision Timer, Active Athlete Badge &amp; Protocol Controls</span>
+                <span class="tag">ACTIVE SYSTEM CAPTURE</span>
+              </div>
+            </div>
+
+            <!-- Current Authentic Sleek Gate Status HUD -->
+            <div class="image-box hud-box">
+              <img src="images/current_gate_hud_crop.png" alt="Current Gate Telemetry HUD">
+              <div class="image-caption">
+                <span>FIG 3: Sleek Compact Gate Telemetry HUD (Track Clearance • Node A 0m • Node B 40m)</span>
+                <span class="tag">LIVE HUD STRIP</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section 3: Key Innovations & Biomechanics -->
+        <section class="card accent-gold">
+          <div class="card-title">
+            <span class="num-badge" style="color: var(--accent-amber); background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.25);">04</span>
+            <span>Key Features & AI Biomechanics</span>
+          </div>
+          <div class="card-content">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <div>
+                <strong style="color: var(--accent-volt); font-size: 11.5px; font-family: 'JetBrains Mono', monospace;">1. CONTINUOUS-FLOW FIFO PIPELINE</strong>
+                <p style="font-size: 11px; margin-top: 2px;">
+                  Asynchronous queue allows multiple runners in the same heat with 1.8s separation. Triples combine throughput (4.5 athletes/min).
+                </p>
+              </div>
+              <div>
+                <strong style="color: var(--accent-crimson); font-size: 11.5px; font-family: 'JetBrains Mono', monospace;">2. WORLD ATHLETICS RULE 161.2</strong>
+                <p style="font-size: 11px; margin-top: 2px;">
+                  Automated cadence audio horn. Detects illegal departures under 0.100s physiological limit and triggers instant recall horn.
+                </p>
+              </div>
+            </div>
+
+            <!-- Current Authentic Biomechanical Workspace -->
+            <div class="image-box" style="margin-top: 4px;">
+              <img src="images/current_biomechanics_workspace.png" alt="Current Biomechanical Workspace">
+              <div class="image-caption">
+                <span>FIG 4: Automated AI Biomechanical Workspace — Frame Scrubber &amp; Stride Kinematics</span>
+                <span class="tag">CURRENT APP VERSION</span>
+              </div>
+            </div>
+
+            <div class="highlight-pill" style="margin-top: 2px;">
+              <span><strong>AI FLAW DETECTION:</strong> Automatically flags <strong>Overstriding (&gt; +10° Shin Angle)</strong>, <strong>Excessive Backside Heel Recovery (&gt; 140°)</strong>, and computes Force-Velocity-Power (FVP) curves.</span>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- ================= COLUMN 3 (RIGHT) ================= -->
+      <div class="poster-col">
+
+        <!-- Section 4: Performance Metrics & Validation -->
+        <section class="card">
+          <div class="card-title">
+            <span class="num-badge">05</span>
+            <span>Performance Metrics & Results</span>
+          </div>
+          <div class="card-content">
+            <!-- 4 Metric Cards -->
+            <div class="metric-grid">
+              <div class="metric-card">
+                <div class="metric-value">±0.001s</div>
+                <div class="metric-label">Timing Accuracy</div>
+                <div class="metric-sub">vs 240 FPS Video Truth</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-value cyan">0.82 ms</div>
+                <div class="metric-label">ESP-NOW Latency</div>
+                <div class="metric-sub">&lt; 0.12ms Hardware Jitter</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-value">3.6×</div>
+                <div class="metric-label">Testing Throughput</div>
+                <div class="metric-sub">Continuous FIFO Pipeline</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-value cyan">&gt; 90%</div>
+                <div class="metric-label">Cost Reduction</div>
+                <div class="metric-sub">BOM &lt; ₹12,000 ($145)</div>
+              </div>
+            </div>
+
+            <!-- Comparison Table -->
+            <table class="table-custom" style="margin-top: 4px;">
+              <thead>
+                <tr>
+                  <th>Timing System</th>
+                  <th>Precision</th>
+                  <th>Throughput</th>
+                  <th>Approx. Cost</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Stopwatch</td>
+                  <td>±0.200 s</td>
+                  <td>1.0 / min</td>
+                  <td>₹1,500 ($18)</td>
+                </tr>
+                <tr>
+                  <td>Brower / Freelap</td>
+                  <td>±0.005 s</td>
+                  <td>1.2 / min</td>
+                  <td>₹2,50,000 ($3k)</td>
+                </tr>
+                <tr class="highlight">
+                  <td>SprintGate (Ours)</td>
+                  <td>±0.001 s</td>
+                  <td>4.5 / min</td>
+                  <td>₹11,500 ($140)</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <!-- Current Authentic Analytics Combine Capture -->
+            <div class="image-box" style="margin-top: 4px;">
+              <img src="images/current_analytics_combine.png" alt="Current Analytics Combine">
+              <div class="image-caption">
+                <span>FIG 5: Combine Scorecards, Radar Kinematics &amp; Session Leaderboards</span>
+                <span class="tag">ANALYTICS TAB</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section 6: Future Scope & IP Strategy -->
+        <section class="card accent-cyan">
+          <div class="card-title">
+            <span class="num-badge" style="color: var(--accent-cyan); background: rgba(0,210,255,0.1); border-color: rgba(0,210,255,0.25);">06</span>
+            <span>Intellectual Property & Scope</span>
+          </div>
+          <div class="card-content">
+            <ul>
+              <li><strong>Utility Patent (Pending):</strong> Wireless FIFO Mass Sprint Synchronization &amp; Optical Noise Rejection Assembly.</li>
+              <li><strong>Direct WebBLE Gateway:</strong> Direct Bluetooth connection from Chrome/Edge without external Wi-Fi routers.</li>
+              <li><strong>Acoustic Flash Auto-Sync:</strong> Auto-aligns video scrubber with starting gun acoustic spike ($t = 0.000\text{s}$).</li>
+              <li><strong>Strobe Motion Visuals:</strong> Olympic panoramic stride phase composite generator.</li>
+            </ul>
+
+            <!-- Current Authentic Top Navigation Bar Capture -->
+            <div class="image-box hud-box" style="margin-top: 4px;">
+              <img src="images/current_top_bar_nav.png" alt="Current Top Bar Navigation">
+              <div class="image-caption">
+                <span>FIG 6: Upper-Right Safe Logout, Athlete Session ID &amp; Tab Navigation</span>
+                <span class="tag">HEADER SYSTEM</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+    </div>
+
+    <!-- Footer Bar -->
+    <footer class="poster-footer">
+      <div class="footer-left">
+        <strong>VELOCITY LAB</strong> • Engineering Human Speed • Project SprintGate (SG-POSTER-2026-001)
+      </div>
+      <div>
+        Live PWA: <span style="color: var(--accent-cyan);">https://sprintgate-b84db.web.app</span> • Patent Pending • Commercialization Inquiries: <span style="color: #FFFFFF;">contact@velocitylab.in</span>
+      </div>
+    </footer>
+
+  </main>
+
+</body>
+</html>

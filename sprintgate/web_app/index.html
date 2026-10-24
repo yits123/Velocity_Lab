@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <!-- ─── Responsive viewport: viewport-fit=cover for iPhone notch / Dynamic Island ─── -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <!-- ─── SEO & PWA Identity ─── -->
+    <title>Velocity Lab — Athletic Timing & Biomechanics System</title>
+    <meta name="description" content="Professional sprint timing, biomechanics analysis, and athlete performance tracking. Powered by dual ESP32 laser gates and real-time AI pose analysis." />
+    <meta name="author" content="Velocity Lab" />
+    <meta name="theme-color" content="#07080a" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)" />
+
+    <!-- ─── PWA / Apple Web App ─── -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Velocity Lab" />
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <!-- ─── Icons ─── -->
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <link rel="apple-touch-icon" href="/icon.svg" />
+
+    <!-- ─── Fonts: preconnect first, then stylesheet ─── -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-gray-50 dark:bg-[#07080a] text-gray-900 dark:text-gray-100 min-h-screen font-sans">
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

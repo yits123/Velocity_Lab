@@ -1,0 +1,920 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .glass-panel {
+    @apply bg-gray-800/50 backdrop-blur-md border border-gray-700/50 rounded-xl shadow-xl;
+  }
+}
+
+/* ==========================================================================
+   BASE FONT SCALE — mobile-first, scales up at each breakpoint
+   ========================================================================== */
+html {
+  font-size: 13px;          /* xs: phones */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Prevent iOS text size adjustment on orientation change */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+@media (min-width: 480px) {
+  html { font-size: 13.5px; } /* sm: phone landscape */
+}
+
+@media (min-width: 768px) {
+  html { font-size: 14px; }  /* md: tablet */
+}
+
+@media (min-width: 1280px) {
+  html { font-size: 14.5px; } /* xl: desktop */
+}
+
+@media (min-width: 1536px) {
+  html { font-size: 15px; }   /* 2xl: large monitor / jumbotron */
+}
+
+/* ==========================================================================
+   BODY — Outfit font + safe area padding for iPhone notch / Dynamic Island
+   ========================================================================== */
+body {
+  font-family: 'Outfit', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  /* Pad the very bottom so content never hides behind the home indicator */
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* ==========================================================================
+   SAFE AREA INSET UTILITIES
+   Use these classes on fixed headers/footers
+   ========================================================================== */
+.safe-top    { padding-top: env(safe-area-inset-top); }
+.safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+.safe-left   { padding-left: env(safe-area-inset-left); }
+.safe-right  { padding-right: env(safe-area-inset-right); }
+
+/* header bar that sits under the status bar */
+.header-safe-top {
+  padding-top: max(0.75rem, env(safe-area-inset-top));
+}
+
+/* bottom nav / toolbar that sits above the home indicator */
+.footer-safe-bottom {
+  padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+}
+
+/* ==========================================================================
+   TOUCH TARGET — Minimum 44×44px on touch devices (Apple HIG / WCAG 2.5.5)
+   ========================================================================== */
+@media (pointer: coarse) {
+  button,
+  [role="button"],
+  a[href],
+  label[for],
+  select,
+  input[type="checkbox"],
+  input[type="radio"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Critical timing controls: larger on touch */
+  .race-primary-btn {
+    min-height: 56px;
+    font-size: 1.05rem;
+    letter-spacing: -0.01em;
+  }
+}
+
+/* ==========================================================================
+   MOBILE BOTTOM-SHEET MODALS
+   On phones (max-width: 767px) centered dialogs slide up from the bottom
+   ========================================================================== */
+@media (max-width: 767px) {
+  /* Backdrop stays full-screen */
+  div[class*="fixed"][class*="inset-0"] {
+    align-items: flex-end !important;
+  }
+
+  /* The dialog card becomes a bottom sheet */
+  div[class*="fixed"][class*="inset-0"] > div,
+  [class*="max-h-[88vh]"],
+  [class*="max-h-[92vh]"],
+  [class*="max-h-[94vh]"],
+  [role="dialog"] {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    top: auto !important;
+    border-radius: 20px 20px 0 0 !important;
+    max-height: 92dvh !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    /* Respect the home indicator */
+    padding-bottom: max(1rem, env(safe-area-inset-bottom)) !important;
+    /* Smooth slide-up */
+    animation: sheet-slide-up 0.28s cubic-bezier(0.34, 1.1, 0.64, 1) both;
+  }
+
+  /* Pull handle pill at the top of bottom sheets */
+  div[class*="fixed"][class*="inset-0"] > div::before,
+  [role="dialog"]::before {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 4px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 9999px;
+    margin: 10px auto 0;
+    flex-shrink: 0;
+  }
+}
+
+@keyframes sheet-slide-up {
+  from { transform: translateY(100%); opacity: 0.6; }
+  to   { transform: translateY(0);    opacity: 1;   }
+}
+
+/* ==========================================================================
+   RESPONSIVE DATA TABLES — cards on mobile, table on desktop
+   ========================================================================== */
+.table-desktop { display: none; }
+.table-mobile  { display: flex; flex-direction: column; gap: 0.5rem; }
+
+@media (min-width: 768px) {
+  .table-desktop { display: table; }
+  .table-mobile  { display: none; }
+}
+
+/* ==========================================================================
+   SCROLLBAR UTILITIES
+   ========================================================================== */
+.scrollbar-none::-webkit-scrollbar { display: none; }
+.scrollbar-none { -ms-overflow-style: none; }
+@supports (scrollbar-width: none) {
+  .scrollbar-none { scrollbar-width: none; }
+}
+
+/* Thin accent scrollbar for panels that should be scrollable */
+.scrollbar-thin::-webkit-scrollbar { width: 4px; height: 4px; }
+.scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.15);
+  border-radius: 9999px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.3);
+}
+
+
+
+html.high-contrast {
+  background-color: #000000 !important;
+  color: #FFFFFF !important;
+}
+
+/* Core Backgrounds & Surfaces */
+html.high-contrast body,
+html.high-contrast .glass-panel,
+html.high-contrast [class*="bg-slate-"], 
+html.high-contrast [class*="bg-gray-"],
+html.high-contrast [class*="bg-zinc-"],
+html.high-contrast [class*="bg-neutral-"],
+html.high-contrast [class*="bg-white"],
+html.high-contrast [class*="bg-emerald-600/10"],
+html.high-contrast [class*="bg-emerald-900/20"],
+html.high-contrast [class*="bg-rose-500/10"] {
+  background-color: #000000 !important;
+  box-shadow: none !important;
+}
+
+/* Strip all background gradients that could paint white stops in High Contrast */
+html.high-contrast [class*="bg-gradient-"],
+html.high-contrast [class*="bg-[radial-gradient"],
+html.high-contrast [class*="from-"],
+html.high-contrast [class*="via-"],
+html.high-contrast [class*="to-"] {
+  background-image: none !important;
+}
+
+/* Add solid 2px borders to all cards and buttons */
+html.high-contrast .glass-panel,
+html.high-contrast button,
+html.high-contrast input,
+html.high-contrast select,
+html.high-contrast [class*="rounded-2xl"],
+html.high-contrast [class*="rounded-xl"],
+html.high-contrast [class*="rounded-3xl"] {
+  border: 2px solid #FFFFFF !important;
+  box-shadow: none !important;
+}
+
+/* Text Overrides - Ultra-Crisp Legibility (WCAG AAA) */
+html.high-contrast [class*="text-gray-"],
+html.high-contrast [class*="text-slate-"],
+html.high-contrast [class*="text-zinc-"] {
+  color: #E2E8F0 !important; /* Secondary text - High-Visibility Off-White */
+}
+
+html.high-contrast h1, html.high-contrast h2, html.high-contrast h3, html.high-contrast h4,
+html.high-contrast [class*="text-gray-900"],
+html.high-contrast [class*="text-gray-100"],
+html.high-contrast [class*="text-slate-900"],
+html.high-contrast [class*="text-white"],
+html.high-contrast [class*="text-black"] {
+  color: #FFFFFF !important; /* Primary text - Pure Crisp White */
+}
+
+/* Hero Timer */
+html.high-contrast [class*="text-8xl"], 
+html.high-contrast [class*="text-9xl"], 
+html.high-contrast [class*="text-7xl"] {
+  color: #FFFF00 !important; /* Yellow for timer */
+  text-shadow: none !important;
+}
+
+/* Accents in High Contrast - Dynamically adapts to the chosen accent! */
+html.high-contrast button[class~="bg-emerald-600"]:not([class*="/"]):not([class*="hover:"]),
+html.high-contrast button[class~="bg-emerald-500"]:not([class*="/"]):not([class*="hover:"]),
+html.high-contrast a[class~="bg-emerald-600"]:not([class*="/"]):not([class*="hover:"]),
+html.high-contrast a[class~="bg-emerald-500"]:not([class*="/"]):not([class*="hover:"]),
+html.high-contrast label[class~="bg-emerald-600"]:not([class*="/"]):not([class*="hover:"]),
+html.high-contrast label[class~="bg-emerald-500"]:not([class*="/"]):not([class*="hover:"]) {
+  background-color: var(--accent-color) !important;
+  color: var(--accent-text) !important;
+  border: 2px solid var(--accent-color) !important;
+  font-weight: 800 !important;
+}
+html.high-contrast button[class~="bg-emerald-600"]:not([class*="/"]):not([class*="hover:"]) *,
+html.high-contrast button[class~="bg-emerald-500"]:not([class*="/"]):not([class*="hover:"]) *,
+html.high-contrast a[class~="bg-emerald-600"]:not([class*="/"]):not([class*="hover:"]) *,
+html.high-contrast a[class~="bg-emerald-500"]:not([class*="/"]):not([class*="hover:"]) * {
+  color: var(--accent-text) !important;
+}
+
+/* Translucent buttons & pills in High Contrast */
+html.high-contrast button[class*="bg-emerald-500/"],
+html.high-contrast button[class*="bg-emerald-600/"],
+html.high-contrast a[class*="bg-emerald-500/"],
+html.high-contrast a[class*="bg-emerald-600/"] {
+  background-color: #000000 !important;
+  color: var(--accent-color) !important;
+  border: 2px solid var(--accent-color) !important;
+  font-weight: 800 !important;
+}
+html.high-contrast button[class*="bg-emerald-500/"] *,
+html.high-contrast button[class*="bg-emerald-600/"] *,
+html.high-contrast a[class*="bg-emerald-500/"] *,
+html.high-contrast a[class*="bg-emerald-600/"] * {
+  color: var(--accent-color) !important;
+}
+html.high-contrast [class~="text-emerald-500"],
+html.high-contrast [class~="text-emerald-400"],
+html.high-contrast [class~="text-emerald-300"],
+html.high-contrast [class~="text-[#00D084]"],
+html.high-contrast [class~="text-[#00e691]"],
+html.high-contrast [class*="text-emerald-"]:not([class*="hover:"]):not([class*="group-hover:"]) {
+  color: var(--accent-color) !important;
+  font-weight: 800 !important;
+}
+html.high-contrast [class~="border-[#00D084]"]:not([class*="hover:"]),
+html.high-contrast [class~="border-emerald-500"]:not([class*="/"]):not([class*="hover:"]),
+html.high-contrast [class*="border-emerald-"]:not([class*="hover:"]) {
+  border-color: var(--accent-color) !important;
+}
+html.high-contrast [class~="border-b-2"] {
+  border-bottom: 3px solid var(--accent-color) !important;
+}
+html.high-contrast div[class~="w-2"][class~="h-2"][class~="bg-emerald-600"],
+html.high-contrast span[class*="w-2"][class*="h-2"][class*="bg-emerald-"] {
+  background-color: var(--accent-color) !important;
+  border: 1px solid #FFFFFF !important;
+}
+
+/* Modals & Popups in High Contrast */
+html.high-contrast div[class*="fixed"][class*="inset-0"] {
+  background-color: rgba(0, 0, 0, 0.95) !important;
+  backdrop-filter: none !important;
+}
+html.high-contrast div[class*="fixed"][class*="inset-0"] > div,
+html.high-contrast [role="dialog"],
+html.high-contrast [class*="max-h-[88vh]"],
+html.high-contrast [class*="max-h-[94vh]"],
+html.high-contrast [class~="z-[130]"],
+html.high-contrast [class~="z-[120]"] > div,
+html.high-contrast [class~="z-[110]"] > div,
+html.high-contrast [class~="z-[100]"] > div,
+html.high-contrast [class~="z-50"] > div {
+  background-color: #050608 !important;
+  background-image: none !important;
+  border: 2px solid #FFFFFF !important;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.25) !important;
+  color: #FFFFFF !important;
+}
+html.high-contrast div[class*="fixed"][class*="inset-0"] [class*="bg-slate-"],
+html.high-contrast div[class*="fixed"][class*="inset-0"] [class*="bg-gray-"],
+html.high-contrast div[class*="fixed"][class*="inset-0"] [class*="bg-white"],
+html.high-contrast div[class*="fixed"][class*="inset-0"] [class*="bg-zinc-"] {
+  background-color: #0d0f15 !important;
+  background-image: none !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+  color: #FFFFFF !important;
+}
+html.high-contrast div[class*="fixed"][class*="inset-0"] button:not([class*="bg-emerald-"]):not([class*="bg-red-"]):not([class*="bg-rose-"]) {
+  border: 2px solid #FFFFFF !important;
+  color: #FFFFFF !important;
+  background-color: #000000 !important;
+}
+
+/* Accents - Danger/Rose/Red */
+html.high-contrast button[class*="bg-rose-"],
+html.high-contrast button[class*="bg-red-"] {
+  background-color: #FF0055 !important;
+  color: #FFFFFF !important;
+  border-color: #FF0055 !important;
+}
+html.high-contrast button[class*="bg-rose-"] *,
+html.high-contrast button[class*="bg-red-"] * {
+  color: #FFFFFF !important;
+}
+html.high-contrast [class*="text-rose-"],
+html.high-contrast [class*="text-red-"] {
+  color: #FF0055 !important;
+}
+
+/* Active/Hover states for buttons */
+html.high-contrast button:hover:not([class*="bg-emerald-"]):not([class*="bg-rose-"]) {
+  background-color: #FFFFFF !important;
+  color: #000000 !important;
+}
+html.high-contrast button:hover:not([class*="bg-emerald-"]):not([class*="bg-rose-"]) * {
+  color: #000000 !important;
+}
+
+/* Video/Images - normal contrast */
+html.high-contrast video, html.high-contrast img {
+  filter: grayscale(100%) contrast(120%);
+  border: 2px solid #FFFFFF !important;
+}
+
+/* SVG stroke overrides */
+html.high-contrast svg {
+  stroke-width: 2.5px;
+}
+/* Custom scrollbar hiding utility */
+.scrollbar-none::-webkit-scrollbar {
+  display: none; /* Safari, Chrome < 121, iOS Safari, Samsung Internet */
+}
+.scrollbar-none {
+  -ms-overflow-style: none; /* IE and legacy Edge */
+}
+@supports (scrollbar-width: none) {
+  .scrollbar-none {
+    scrollbar-width: none; /* Firefox, Chrome 121+, Safari 17.4+ */
+  }
+}
+
+/* ==========================================================================
+   ATHLETIC COLOR ACCENT THEMES (Orange, Red, Green, Cyan, Purple, Yellow)
+   Replicating High-Performance Hardware Contrast Aesthetics (Image 2)
+   ========================================================================== */
+
+/* Modern Athletic Typography defaults */
+body {
+  font-family: 'Outfit', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  letter-spacing: -0.012em;
+}
+
+h1, h2, h3, h4, .font-heading {
+  font-family: 'Outfit', sans-serif;
+  letter-spacing: -0.025em;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+:root {
+  --accent-color: #00E599;
+  --accent-rgb: 0, 229, 153;
+  --accent-hover: #00c784;
+  --accent-glow: rgba(0, 229, 153, 0.4);
+  --accent-text: #000000;
+  --accent-ui-text: #059669;
+  --theme-bg-dark: #07080a;
+}
+
+/* Orange: Ignite Blaze (Orange, Black & White - reference Image 2) */
+html[data-theme-accent="orange"] {
+  --accent-color: #FF5500;
+  --accent-rgb: 255, 85, 0;
+  --accent-hover: #e04b00;
+  --accent-glow: rgba(255, 85, 0, 0.4);
+  --accent-text: #FFFFFF;
+  --accent-ui-text: #D94800;
+  --theme-bg-dark: #07080a;
+}
+
+/* Red: Apex Crimson (Red, Black & White) */
+html[data-theme-accent="red"] {
+  --accent-color: #FF204E;
+  --accent-rgb: 255, 32, 78;
+  --accent-hover: #e6123e;
+  --accent-glow: rgba(255, 32, 78, 0.4);
+  --accent-text: #FFFFFF;
+  --accent-ui-text: #E11D48;
+  --theme-bg-dark: #07080a;
+}
+
+/* Green: Velocity Emerald (Classic Laser Green) */
+html[data-theme-accent="emerald"] {
+  --accent-color: #00E599;
+  --accent-rgb: 0, 229, 153;
+  --accent-hover: #00c784;
+  --accent-glow: rgba(0, 229, 153, 0.4);
+  --accent-text: #000000;
+  --accent-ui-text: #059669;
+  --theme-bg-dark: #07080a;
+}
+
+/* Cyan: Electric Cyan (Cyan, Black & White) */
+html[data-theme-accent="cyan"] {
+  --accent-color: #00E5FF;
+  --accent-rgb: 0, 229, 255;
+  --accent-hover: #00c7de;
+  --accent-glow: rgba(0, 229, 255, 0.4);
+  --accent-text: #000000;
+  --accent-ui-text: #0284C7;
+  --theme-bg-dark: #07080a;
+}
+
+/* Purple: Hyper Violet (Purple, Black & White) */
+html[data-theme-accent="purple"] {
+  --accent-color: #A855F7;
+  --accent-rgb: 168, 85, 247;
+  --accent-hover: #9333ea;
+  --accent-glow: rgba(168, 85, 247, 0.4);
+  --accent-text: #FFFFFF;
+  --accent-ui-text: #7E22CE;
+  --theme-bg-dark: #07080a;
+}
+
+/* Yellow: Volt Neon (Volt Yellow, Black & White) */
+html[data-theme-accent="yellow"] {
+  --accent-color: #FAFF00;
+  --accent-rgb: 250, 255, 0;
+  --accent-hover: #e0e500;
+  --accent-glow: rgba(250, 255, 0, 0.4);
+  --accent-text: #000000;
+  --accent-ui-text: #A16207;
+  --theme-bg-dark: #07080a;
+}
+
+/* ==========================================================================
+   BACKGROUNDS & MATTE SURFACES (Dark & Light Modes)
+   ========================================================================== */
+
+/* Dark Mode: Deep pitch-black background with top ambient spotlight glow */
+html.dark[data-theme-accent] body {
+  background-color: #07080a !important;
+  background-image: 
+    radial-gradient(ellipse 75% 360px at 50% -30px, rgba(var(--accent-rgb), 0.16), transparent 75%),
+    linear-gradient(180deg, rgba(var(--accent-rgb), 0.04) 0%, transparent 220px) !important;
+  background-repeat: no-repeat !important;
+  background-attachment: fixed !important;
+  color: #f1f5f9 !important;
+}
+
+/* Light Mode: Clean crisp white background with faint ambient top light */
+html.light[data-theme-accent] body {
+  background-color: #f8fafc !important;
+  background-image: radial-gradient(ellipse 65% 260px at 50% 0%, rgba(var(--accent-rgb), 0.05), transparent 70%) !important;
+  background-repeat: no-repeat !important;
+  background-attachment: fixed !important;
+  color: #0f172a !important;
+}
+
+/* Cards & Panels: Solid dark obsidian in dark mode, clean white in light mode */
+html.dark[data-theme-accent] [class~="dark:bg-slate-900"],
+html.dark[data-theme-accent] [class~="dark:bg-slate-800"],
+html.dark[data-theme-accent] .glass-panel {
+  background-color: #0d0f14 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+html.dark[data-theme-accent] [class~="dark:bg-slate-950"] {
+  background-color: #07080a !important;
+}
+
+html.dark[data-theme-accent] aside {
+  background-color: #090b0f !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+html.light[data-theme-accent] .glass-panel {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.05) !important;
+}
+
+/* ==========================================================================
+   MODALS, DIALOGS & POPUPS ACROSS ALL MODES
+   ========================================================================== */
+
+/* Dark Mode Modal Styling */
+html.dark[data-theme-accent] div[class*="fixed"][class*="inset-0"] {
+  backdrop-filter: blur(12px) !important;
+  background-color: rgba(0, 0, 0, 0.82) !important;
+}
+
+html.dark[data-theme-accent] div[class*="fixed"][class*="inset-0"] > div,
+html.dark[data-theme-accent] [class~="z-[130]"],
+html.dark[data-theme-accent] [class~="z-[120]"] > div,
+html.dark[data-theme-accent] [class~="z-[110]"] > div,
+html.dark[data-theme-accent] [class~="z-[100]"] > div,
+html.dark[data-theme-accent] [class~="z-50"] > div {
+  background-color: #0d0f14 !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.95), 0 0 35px -5px rgba(var(--accent-rgb), 0.16) !important;
+}
+
+/* Light Mode Modal Styling */
+html.light[data-theme-accent]:not(.high-contrast) div[class*="fixed"][class*="inset-0"] {
+  backdrop-filter: blur(10px) !important;
+  background-color: rgba(15, 23, 42, 0.45) !important;
+}
+
+html.light[data-theme-accent]:not(.high-contrast) div[class*="fixed"][class*="inset-0"] > div,
+html.light[data-theme-accent]:not(.high-contrast) [class~="z-[130]"],
+html.light[data-theme-accent]:not(.high-contrast) [class~="z-[120]"] > div,
+html.light[data-theme-accent]:not(.high-contrast) [class~="z-[110]"] > div,
+html.light[data-theme-accent]:not(.high-contrast) [class~="z-[100]"] > div,
+html.light[data-theme-accent]:not(.high-contrast) [class~="z-50"] > div {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.15), 0 0 30px -5px rgba(var(--accent-rgb), 0.08) !important;
+  color: #0f172a !important;
+}
+
+/* Modal Inner Sub-cards in Light Mode */
+html.light[data-theme-accent]:not(.high-contrast) div[class*="fixed"][class*="inset-0"] [class*="bg-slate-100"],
+html.light[data-theme-accent]:not(.high-contrast) div[class*="fixed"][class*="inset-0"] [class*="bg-slate-50"],
+html.light[data-theme-accent]:not(.high-contrast) div[class*="fixed"][class*="inset-0"] [class*="bg-gray-100"] {
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
+/* ==========================================================================
+   ACCENT ELEMENT OVERRIDES (Strict, Non-Greedy, Adapting across All Modes)
+   ========================================================================== */
+
+/* Primary Solid Action Buttons & Active Option Pills (Strictly standalone classes, NEVER matching translucent or hover) */
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) button[class~="bg-emerald-600"]:not([class*="/"]):not([class*="hover:"]),
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) button[class~="bg-emerald-500"]:not([class*="/"]):not([class*="hover:"]),
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) a[class~="bg-emerald-600"]:not([class*="/"]):not([class*="hover:"]),
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) a[class~="bg-emerald-500"]:not([class*="/"]):not([class*="hover:"]),
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) label[class~="bg-emerald-600"]:not([class*="/"]):not([class*="hover:"]),
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) label[class~="bg-emerald-500"]:not([class*="/"]):not([class*="hover:"]),
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) span[class~="bg-emerald-600"]:not([class*="/"]):not([class*="hover:"]),
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) span[class~="bg-emerald-500"]:not([class*="/"]):not([class*="hover:"]),
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) div[class~="bg-emerald-600"]:not([class*="/"]):not([class*="hover:"]),
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) div[class~="bg-emerald-500"]:not([class*="/"]):not([class*="hover:"]) {
+  background-color: var(--accent-color) !important;
+  color: var(--accent-text) !important;
+  box-shadow: 0 0 16px rgba(var(--accent-rgb), 0.25) !important;
+  font-weight: 700 !important;
+}
+
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) button[class~="bg-emerald-600"]:not([class*="/"]):not([class*="hover:"]) *,
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) button[class~="bg-emerald-500"]:not([class*="/"]):not([class*="hover:"]) *,
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) a[class~="bg-emerald-600"]:not([class*="/"]):not([class*="hover:"]) *,
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) a[class~="bg-emerald-500"]:not([class*="/"]):not([class*="hover:"]) *,
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) span[class~="bg-emerald-600"]:not([class*="/"]):not([class*="hover:"]) *,
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) span[class~="bg-emerald-500"]:not([class*="/"]):not([class*="hover:"]) *,
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) div[class~="bg-emerald-600"]:not([class*="/"]):not([class*="hover:"]) *,
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) div[class~="bg-emerald-500"]:not([class*="/"]):not([class*="hover:"]) * {
+  color: var(--accent-text) !important;
+}
+
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) button[class~="bg-emerald-600"]:not([class*="/"]):not([class*="hover:"]):hover,
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) button[class~="bg-emerald-500"]:not([class*="/"]):not([class*="hover:"]):hover,
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) a[class~="bg-emerald-600"]:not([class*="/"]):not([class*="hover:"]):hover,
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) a[class~="bg-emerald-500"]:not([class*="/"]):not([class*="hover:"]):hover {
+  background-color: var(--accent-hover) !important;
+  color: var(--accent-text) !important;
+}
+
+/* Translucent Feature Buttons, Pills & Badges (Stadium Display, Test 40m Sprint Now, Phone badge, TV Mode) */
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) [class*="bg-emerald-500/"],
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) [class*="bg-emerald-600/"],
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) [class*="bg-emerald-900/"] {
+  background-color: rgba(var(--accent-rgb), 0.12) !important;
+}
+
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) button[class*="bg-emerald-600/"]:hover,
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) button[class*="bg-emerald-500/"]:hover,
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) a[class*="bg-emerald-500/"]:hover,
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) a[class*="bg-emerald-600/"]:hover {
+  background-color: rgba(var(--accent-rgb), 0.22) !important;
+  border-color: rgba(var(--accent-rgb), 0.5) !important;
+}
+
+/* Buttons that turn solid on hover (e.g. Test 40m Sprint Now) */
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) button[class*="hover:bg-emerald-600"]:not([class*="hover:bg-emerald-600/"]):hover,
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) button[class*="hover:bg-emerald-500"]:not([class*="hover:bg-emerald-500/"]):hover {
+  background-color: var(--accent-color) !important;
+  color: var(--accent-text) !important;
+}
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) button[class*="hover:bg-emerald-600"]:not([class*="hover:bg-emerald-600/"]):hover *,
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) button[class*="hover:bg-emerald-500"]:not([class*="hover:bg-emerald-500/"]):hover * {
+  color: var(--accent-text) !important;
+}
+
+/* Ghost Buttons with hover accent (e.g. Send 1 to Line) */
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) button[class*="hover:bg-emerald-600/"]:hover,
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) button[class*="hover:bg-emerald-500/"]:hover {
+  background-color: rgba(var(--accent-rgb), 0.18) !important;
+}
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) [class*="hover:border-[#00D084]"]:hover {
+  border-color: rgba(var(--accent-rgb), 0.5) !important;
+}
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) [class*="hover:text-emerald-500"]:hover,
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) [class*="hover:text-emerald-400"]:hover {
+  color: var(--accent-color) !important;
+}
+
+/* Checkboxes on Athlete Cards - Only filled when actively selected */
+html[data-theme-accent]:not([data-theme-accent="emerald"]) div[class~="bg-[#00D084]"] {
+  background-color: var(--accent-color) !important;
+  border-color: var(--accent-color) !important;
+  color: var(--accent-text) !important;
+}
+html[data-theme-accent]:not([data-theme-accent="emerald"]) div[class~="bg-[#00D084]"] * {
+  color: var(--accent-text) !important;
+}
+
+/* Accent Text & Numbers in Dark Mode (Active/Standalone text, strictly excluding hover-only text) */
+html.dark[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) [class~="text-emerald-500"],
+html.dark[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) [class~="text-emerald-400"],
+html.dark[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) [class~="text-emerald-300"],
+html.dark[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) [class~="text-emerald-600"],
+html.dark[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) [class~="text-[#00D084]"],
+html.dark[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) [class~="text-[#00e691]"],
+html.dark[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) [class*="text-emerald-"]:not([class*="hover:"]):not([class*="group-hover:"]) {
+  color: var(--accent-color) !important;
+}
+
+/* Accent Text & Numbers in Light Mode (Calibrated for high readability against white, strictly excluding hover-only text) */
+html.light[data-theme-accent]:not(.high-contrast) [class~="text-emerald-500"],
+html.light[data-theme-accent]:not(.high-contrast) [class~="text-emerald-400"],
+html.light[data-theme-accent]:not(.high-contrast) [class~="text-emerald-300"],
+html.light[data-theme-accent]:not(.high-contrast) [class~="text-emerald-600"],
+html.light[data-theme-accent]:not(.high-contrast) [class~="text-[#00D084]"],
+html.light[data-theme-accent]:not(.high-contrast) [class~="text-[#00e691]"],
+html.light[data-theme-accent]:not(.high-contrast) [class*="text-emerald-"]:not([class*="hover:"]):not([class*="group-hover:"]) {
+  color: var(--accent-ui-text) !important;
+}
+
+/* Ensure buttons turning solid on hover always have proper high-contrast text in all themes & modes */
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) button[class*="hover:bg-emerald-600"]:not([class*="hover:bg-emerald-600/"]):hover,
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) button[class*="hover:bg-emerald-500"]:not([class*="hover:bg-emerald-500/"]):hover {
+  background-color: var(--accent-color) !important;
+  color: var(--accent-text) !important;
+}
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) button[class*="hover:bg-emerald-600"]:not([class*="hover:bg-emerald-600/"]):hover *,
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) button[class*="hover:bg-emerald-500"]:not([class*="hover:bg-emerald-500/"]):hover * {
+  color: var(--accent-text) !important;
+}
+
+/* Translucent Borders */
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) [class*="border-emerald-500/"],
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) [class*="border-emerald-600/"],
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) [class*="border-[#00D084]/"] {
+  border-color: rgba(var(--accent-rgb), 0.35) !important;
+}
+
+/* Solid Borders (Strict non-hover, non-slash matches) */
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) [class~="border-[#00D084]"]:not([class*="hover:"]),
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) [class~="border-emerald-500"]:not([class*="/"]):not([class*="hover:"]) {
+  border-color: var(--accent-color) !important;
+}
+
+/* Active Tab Underline */
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) [class~="border-b-2"][class*="border-"] {
+  border-bottom-color: var(--accent-color) !important;
+}
+
+/* Active Status Dots & Pulse Indicators */
+html[data-theme-accent]:not([data-theme-accent="emerald"]) [class*="bg-emerald-400"]:not(button):not(a):not(label),
+html[data-theme-accent]:not([data-theme-accent="emerald"]) [class*="bg-[#00D084]"]:not(button):not(a):not(label):not([class*="hover:"]),
+html[data-theme-accent]:not([data-theme-accent="emerald"]) div[class~="w-2"][class~="h-2"][class~="bg-emerald-600"],
+html[data-theme-accent]:not([data-theme-accent="emerald"]) span[class*="w-2"][class*="h-2"][class*="bg-emerald-"] {
+  background-color: var(--accent-color) !important;
+  box-shadow: 0 0 10px var(--accent-color) !important;
+}
+
+/* Toggle Switches (.peer:checked) in Modals & Forms */
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) input:checked + div[class*="peer-checked:bg-emerald-500"],
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) .peer:checked ~ [class*="peer-checked:bg-emerald-500"],
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) [class*="peer-checked:bg-emerald-500"] {
+  background-color: var(--accent-color) !important;
+}
+
+/* Modal Header Gradients */
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) [class*="from-emerald-500/10"] {
+  --tw-gradient-from: rgba(var(--accent-rgb), 0.14) var(--tw-gradient-from-position) !important;
+}
+
+/* Ambient Stopwatch Glow */
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) [class*="via-[#00D084]"] {
+  --tw-gradient-stops: var(--tw-gradient-from, transparent), rgba(var(--accent-rgb), 0.08), var(--tw-gradient-to, transparent) !important;
+}
+
+/* Sliders & Form Controls */
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) input[type="range"] {
+  accent-color: var(--accent-color) !important;
+}
+
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) input:focus,
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) select:focus,
+html[data-theme-accent]:not([data-theme-accent="emerald"]):not(.high-contrast) textarea:focus {
+  border-color: var(--accent-color) !important;
+  box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.35) !important;
+}
+
+/* Text Selection */
+html[data-theme-accent]:not(.high-contrast) ::selection {
+  background-color: var(--accent-color) !important;
+  color: var(--accent-text) !important;
+}
+
+/* ==========================================================================
+   Virtual Cyber Athlete Animation Keyframes (Global)
+   ========================================================================== */
+@keyframes vl-cyber-arm-front {
+  0%, 100% { transform: rotate(-48deg); }
+  50% { transform: rotate(42deg); }
+}
+@keyframes vl-cyber-arm-back {
+  0%, 100% { transform: rotate(44deg); }
+  50% { transform: rotate(-48deg); }
+}
+@keyframes vl-cyber-leg-front {
+  0%, 100% { transform: rotate(50deg); }
+  50% { transform: rotate(-36deg); }
+}
+@keyframes vl-cyber-leg-back {
+  0%, 100% { transform: rotate(-36deg); }
+  50% { transform: rotate(50deg); }
+}
+@keyframes vl-scanline-drift {
+  0% { opacity: 0.95; transform: scaleX(1); }
+  50% { opacity: 0.35; transform: scaleX(1.35) translateX(-5px); }
+  100% { opacity: 0.95; transform: scaleX(1); }
+}
+@keyframes vl-core-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(1.4); opacity: 1; }
+}
+
+/* ==========================================================================
+   HIGH CONTRAST MODE (WCAG AAA OLED ARCHITECTURE) - MAXIMUM SPECIFICITY
+   ========================================================================== */
+html.high-contrast,
+html.high-contrast body,
+html.high-contrast #root {
+  background-color: #000000 !important;
+  color: #FFFFFF !important;
+}
+
+/* 1. All Modals, Dialogs, Bottom Sheets & Floating Panels across ALL Z-INDEXES */
+html.high-contrast [class*="fixed"][class*="inset-0"] > div,
+html.high-contrast [class*="z-[200]"] > div,
+html.high-contrast [class*="z-[130]"] > div,
+html.high-contrast [class*="z-[120]"] > div,
+html.high-contrast [class*="z-[110]"] > div,
+html.high-contrast [class*="z-[100]"] > div,
+html.high-contrast [class*="z-50"] > div,
+html.high-contrast [class*="max-h-[88vh]"],
+html.high-contrast [class*="max-h-[92vh]"],
+html.high-contrast [class*="max-h-[94vh]"],
+html.high-contrast [role="dialog"],
+html.high-contrast [role="dialog"] > div {
+  background-color: #050608 !important;
+  background-image: none !important;
+  border: 2px solid #FFFFFF !important;
+  box-shadow: 0 0 0 1px #000000, 0 15px 50px rgba(0, 0, 0, 0.95) !important;
+  color: #FFFFFF !important;
+}
+
+/* 2. Modal Backdrop Overlay */
+html.high-contrast [class*="fixed"][class*="inset-0"] {
+  background-color: rgba(0, 0, 0, 0.92) !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+/* 3. Inner Cards, Form Containers, Strips & Sub-panels inside Modals */
+html.high-contrast [class*="fixed"][class*="inset-0"] [class*="bg-slate-"],
+html.high-contrast [class*="fixed"][class*="inset-0"] [class*="bg-gray-"],
+html.high-contrast [class*="fixed"][class*="inset-0"] [class*="bg-zinc-"],
+html.high-contrast [class*="fixed"][class*="inset-0"] [class*="bg-white"],
+html.high-contrast [class*="fixed"][class*="inset-0"] [class*="bg-[#"] {
+  background-color: #0d0f15 !important;
+  background-image: none !important;
+  border-color: rgba(255, 255, 255, 0.35) !important;
+  color: #FFFFFF !important;
+}
+
+/* 4. Combine Scorecard Hero Card & Gradient Stripping */
+html.high-contrast [class*="bg-gradient-"],
+html.high-contrast [class*="bg-[radial-gradient"] {
+  background-image: none !important;
+  background-color: #050608 !important;
+}
+
+html.high-contrast div[class*="from-gray-50"][class*="via-white"],
+html.high-contrast div[class*="rounded-3xl"][class*="p-6"],
+html.high-contrast div[class*="rounded-3xl"][class*="p-8"] {
+  background-color: #050608 !important;
+  background-image: none !important;
+  border: 2px solid #FFFFFF !important;
+  color: #FFFFFF !important;
+}
+
+/* 5. Typography in High Contrast: Crisp White Headers & High-Visibility Off-White Secondary */
+html.high-contrast [class*="text-gray-"],
+html.high-contrast [class*="text-slate-"],
+html.high-contrast [class*="text-zinc-"] {
+  color: #E2E8F0 !important;
+}
+
+html.high-contrast [class*="text-cyan-"],
+html.high-contrast [class*="text-sky-"] {
+  color: #38BDF8 !important;
+}
+
+html.high-contrast [class*="text-gray-900"],
+html.high-contrast [class*="text-slate-900"],
+html.high-contrast [class*="text-white"],
+html.high-contrast [class*="text-black"],
+html.high-contrast h1, html.high-contrast h2, html.high-contrast h3, html.high-contrast h4 {
+  color: #FFFFFF !important;
+}
+
+/* 6. Buttons & Inputs in High Contrast */
+html.high-contrast button,
+html.high-contrast input,
+html.high-contrast select {
+  border: 2px solid #FFFFFF !important;
+}
+
+html.high-contrast button:not([class*="bg-emerald-"]):not([class*="bg-green-"]):not([class*="bg-red-"]):not([class*="bg-rose-"]):not([class*="bg-amber-"]) {
+  background-color: #000000 !important;
+  color: #FFFFFF !important;
+}
+
+/* ==========================================================================
+   MOBILE TOUCH OPTIMIZATION & NATIVE BOTTOM SHEET (WCAG 2.5.5 / iOS HIG)
+   ========================================================================== */
+@media (max-width: 767px) {
+  /* Fast tap response without 300ms double-tap delay */
+  a, button, [role="button"], input, select {
+    touch-action: manipulation;
+  }
+
+  /* Bottom sheet modal styling for mobile screens */
+  .mobile-sheet-dialog {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    top: auto !important;
+    transform: none !important;
+    border-radius: 20px 20px 0 0 !important;
+    max-height: 92dvh !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+/* ==========================================================================
+   PERFORMANCE: CONTENT-VISIBILITY VIRTUALIZATION (Zero-Dependency)
+   Allows browser engine to bypass off-screen rendering for long tables/cards
+   ========================================================================== */
+.virtual-table-row {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 54px;
+}
+
+.virtual-roster-card {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 96px;
+}
+
+
+
+
+

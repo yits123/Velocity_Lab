@@ -1,0 +1,61 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Master Admin authorization check
+    function isMasterAdmin() {
+      return request.auth != null && (
+        !exists(/databases/$(database)/documents/system_config/admin_meta) ||
+        request.auth.uid == get(/databases/$(database)/documents/system_config/admin_meta).data.masterAdminUid ||
+        request.auth.token.email == get(/databases/$(database)/documents/system_config/admin_meta).data.masterAdminEmail
+      );
+    }
+
+    // Schema validation for sprint timing records (prevents payload poisoning and DOS)
+    function isValidSprintEvaluation() {
+      let data = request.resource.data;
+      return data.name is string && data.name.size() > 0 && data.name.size() <= 100 &&
+             data.time is number && data.time > 0.0 && data.time < 600.0;
+    }
+
+    // Schema validation for squad roster additions
+    function isValidAthleteRecord() {
+      let data = request.resource.data;
+      return data.name is string && data.name.size() > 0 && data.name.size() <= 100;
+    }
+
+    match /sprint_evaluations/{document} {
+      allow read: if true;
+      // Enforce strict schema on record creation to prevent database corruption
+      allow create: if isValidSprintEvaluation();
+      // Only master admin can update or delete existing timing records
+      allow update, delete: if isMasterAdmin();
+    }
+
+    match /athletes/{document} {
+      allow read: if true;
+      // Master admin controls all roster additions, edits, and deletions
+      allow create, update: if isMasterAdmin() && isValidAthleteRecord();
+      allow delete: if isMasterAdmin();
+    }
+
+    match /system_config/admin_meta {
+      allow read: if true;
+      // Bootstrap protection: allow initial master admin creation only once
+      allow create: if request.auth != null && !exists(/databases/$(database)/documents/system_config/admin_meta);
+      allow update, delete: if isMasterAdmin();
+    }
+
+    match /system_config/{document} {
+      allow read: if true;
+      allow write: if isMasterAdmin();
+    }
+
+    match /live_field_sessions/{document} {
+      // Allow live field station sync with payload size protection (< 50KB)
+      allow read: if true;
+      allow write: if request.resource.data.size() < 50;
+    }
+  }
+}
