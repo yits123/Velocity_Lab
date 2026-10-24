@@ -206,10 +206,18 @@ void IRAM_ATTR handleFinishInterrupt() {
   }
 }
 
+const char* GATE_AUTH_TOKEN = "VLab-Gate-2026-Secured";
+
+bool isRequestAuthorized() {
+  if (server.hasHeader("X-Gate-Auth") && server.header("X-Gate-Auth") == GATE_AUTH_TOKEN) return true;
+  if (server.hasArg("token") && server.arg("token") == GATE_AUTH_TOKEN) return true;
+  return false;
+}
+
 void sendCORS() {
   server.sendHeader("Access-Control-Allow-Origin", "*");
   server.sendHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  server.sendHeader("Access-Control-Allow-Headers", "*");
+  server.sendHeader("Access-Control-Allow-Headers", "Content-Type, X-Gate-Auth");
 }
 
 void setup() {
@@ -275,6 +283,10 @@ void setup() {
 
   server.on("/reset", HTTP_GET, []() {
     sendCORS();
+    if (!isRequestAuthorized()) {
+      server.send(401, "application/json", "{\"error\":\"Unauthorized: Gate security token required\",\"code\":401}");
+      return;
+    }
     activeRunners = 0;
     updateDisplay(DISPLAY_READY);
     broadcastState();
@@ -282,6 +294,8 @@ void setup() {
   });
   server.on("/reset", HTTP_OPTIONS, []() { sendCORS(); server.send(204); });
 
+  const char* headerkeys[] = {"X-Gate-Auth"};
+  server.collectHeaders(headerkeys, 1);
   server.begin();
   
   webSocket.begin();

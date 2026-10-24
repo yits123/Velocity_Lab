@@ -144,24 +144,11 @@ const MultiDeviceSyncModal = React.lazy(() => import('./components/MultiDeviceSy
 const GateConnectionModal = React.lazy(() => import('./components/GateConnectionModal'));
 import liveFieldSyncService from './utils/liveFieldSyncService';
 import webSerialSprintGateService from './utils/webSerialSprintGateService';
+import { buildSecureGateUrl, DEFAULT_GATE_AUTH_TOKEN, sanitizeText, sanitizeBib } from './utils/securitySanitizer';
 
 // Protocol-aware helper to build Gate HTTP URLs for ESP32 endpoints
 export const getGateHttpUrl = (host, path) => {
-  if (!host) return null;
-  const trimmed = host.trim();
-  if (!trimmed) return null;
-  const cleanPath = path.startsWith('/') ? path : `/${path}`;
-  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
-    const base = trimmed.replace(/\/+$/, '');
-    return `${base}${cleanPath}`;
-  }
-  const cleanHost = trimmed
-    .replace(/^(wss?:\/\/)/i, '')
-    .replace(/^(https?:\/\/)/i, '')
-    .replace(/\/.*$/, '')
-    .trim();
-  if (!cleanHost) return null;
-  return `http://${cleanHost}${cleanPath}`;
+  return buildSecureGateUrl(host, path, DEFAULT_GATE_AUTH_TOKEN);
 };
 
 // Protocol-aware helper to build Gate WebSocket URLs for ESP32 timing gate (Port 81)
@@ -188,7 +175,7 @@ export const sendGateCommand = (host, path) => {
   const url = getGateHttpUrl(host, path);
   if (!url) return;
   try {
-    fetch(url, { mode: 'no-cors' }).catch(() => {});
+    fetch(url, { mode: 'no-cors', headers: { 'X-Gate-Auth': DEFAULT_GATE_AUTH_TOKEN } }).catch(() => {});
   } catch (e) {}
 };
 
@@ -3506,11 +3493,19 @@ export default function App() {
     }
     if (!newAthlete.name || !newAthlete.bib) return;
     
+    // Security: sanitize athlete text and bib against XSS and injection
+    const cleanName = sanitizeText(newAthlete.name, 100);
+    const cleanBib = sanitizeBib(newAthlete.bib, 12);
+    const cleanSport = sanitizeText(newAthlete.sport || '', 60);
+
     if (editingAthleteId) {
       const updatedAthlete = { 
         ...newAthlete, 
+        name: cleanName,
+        bib: cleanBib,
+        sport: cleanSport,
         id: editingAthleteId,
-        phone: newAthlete.whatsapp || ''
+        phone: sanitizeText(newAthlete.whatsapp || '', 20)
       };
       setRoster(roster.map(a => a.id === editingAthleteId ? updatedAthlete : a));
       setEditingAthleteId(null);
@@ -3526,8 +3521,11 @@ export default function App() {
     } else {
       const athleteToSave = { 
         ...newAthlete, 
+        name: cleanName,
+        bib: cleanBib,
+        sport: cleanSport,
         id: Date.now(),
-        phone: newAthlete.whatsapp || ''
+        phone: sanitizeText(newAthlete.whatsapp || '', 20)
       };
       setRoster([...roster, athleteToSave]);
       setNewAthlete({ name: '', bib: '', age: '', gender: 'M', sport: '', weight: '', height: '', rfidUid: '', whatsapp: '', email: '' });
