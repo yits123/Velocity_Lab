@@ -16,6 +16,7 @@
  */
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { 
   ShieldCheck, ShieldAlert, AlertTriangle, CheckCircle2, 
   Volume2, Play, Pause, RotateCcw, Download, Copy, Check, 
@@ -800,8 +801,22 @@ Standard: World Athletics Technical Rule 16.7`;
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 overflow-y-auto">
-      <div className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700/80 rounded-3xl w-full max-w-4xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden animate-in fade-in zoom-in-95 duration-200 text-gray-900 dark:text-white">
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+      className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 overflow-y-auto"
+      onClick={onClose}
+    >
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.94, y: 15 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.94, y: 15 }}
+        transition={{ type: 'spring', stiffness: 350, damping: 28 }}
+        className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700/80 rounded-3xl w-full max-w-4xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden text-gray-900 dark:text-white"
+        onClick={(e) => e.stopPropagation()}
+      >
         
         {/* Top Header */}
         <div className="px-5 py-4 border-b border-gray-200 dark:border-slate-800 flex items-center justify-between bg-gray-50 dark:bg-slate-950/60">
@@ -824,13 +839,15 @@ Standard: World Athletics Technical Rule 16.7`;
               </h2>
             </div>
           </div>
-          <button 
+          <motion.button 
+            whileHover={{ scale: 1.08 }}
+            whileTap={{ scale: 0.92 }}
             onClick={onClose}
             className="p-2 text-gray-400 hover:text-gray-700 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-800 rounded-xl transition"
             title="Close Auditor"
           >
             <X size={20} />
-          </button>
+          </motion.button>
         </div>
 
         {/* Hero Ruling Banner */}
@@ -860,7 +877,10 @@ Standard: World Athletics Technical Rule 16.7`;
             </div>
 
             {/* Big RT Pill */}
-            <div className="flex sm:flex-col items-baseline sm:items-end justify-between w-full sm:w-auto bg-white/80 dark:bg-slate-900/80 px-4 py-2.5 rounded-2xl border border-gray-200 dark:border-slate-700/60 shadow-xs shrink-0">
+            <motion.div 
+              whileHover={{ scale: 1.02 }}
+              className="flex sm:flex-col items-baseline sm:items-end justify-between w-full sm:w-auto bg-white/80 dark:bg-slate-900/80 px-4 py-2.5 rounded-2xl border border-gray-200 dark:border-slate-700/60 shadow-xs shrink-0 cursor-default"
+            >
               <span className="text-[10px] font-bold text-gray-500 dark:text-slate-400 uppercase tracking-widest">Reaction Time</span>
               <div className="text-3xl sm:text-4xl font-black font-mono tracking-tighter" style={{ color: status.color }}>
                 {(testRtMs / 1000).toFixed(3)}
@@ -869,34 +889,50 @@ Standard: World Athletics Technical Rule 16.7`;
               <span className="text-[11px] font-mono text-gray-500 dark:text-slate-400">
                 {testRtMs} ms ({status.deltaLabel})
               </span>
-            </div>
+            </motion.div>
           </div>
         </div>
 
         {/* 4-Box Telemetry Matrix */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 p-4 border-b border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-950/40 text-xs">
-          <div className="p-2.5 rounded-xl bg-white dark:bg-slate-800/60 border border-gray-200 dark:border-slate-700/40 shadow-xs">
+          <motion.div 
+            whileHover={{ y: -2, scale: 1.02 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            className="p-2.5 rounded-xl bg-white dark:bg-slate-800/60 border border-gray-200 dark:border-slate-700/40 shadow-xs cursor-default"
+          >
             <span className="text-gray-500 dark:text-slate-400 block text-[10px] uppercase font-bold">WA SIS Threshold</span>
             <span className="text-base font-bold font-mono text-gray-900 dark:text-white mt-0.5 block">0.100s (100ms)</span>
             <span className="text-[10px] text-gray-400 dark:text-slate-400">Absolute legal limit</span>
-          </div>
-          <div className="p-2.5 rounded-xl bg-white dark:bg-slate-800/60 border border-gray-200 dark:border-slate-700/40 shadow-xs">
+          </motion.div>
+          <motion.div 
+            whileHover={{ y: -2, scale: 1.02 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            className="p-2.5 rounded-xl bg-white dark:bg-slate-800/60 border border-gray-200 dark:border-slate-700/40 shadow-xs cursor-default"
+          >
             <span className="text-gray-500 dark:text-slate-400 block text-[10px] uppercase font-bold">Safety Margin</span>
             <span className={`text-base font-bold font-mono mt-0.5 block ${testRtMs >= 100 ? 'text-emerald-500 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'}`}>
               {testRtMs >= 100 ? `+${testRtMs - 100} ms` : `${testRtMs - 100} ms`}
             </span>
             <span className="text-[10px] text-gray-400 dark:text-slate-400">Buffer to disqualification</span>
-          </div>
-          <div className="p-2.5 rounded-xl bg-white dark:bg-slate-800/60 border border-gray-200 dark:border-slate-700/40 shadow-xs">
+          </motion.div>
+          <motion.div 
+            whileHover={{ y: -2, scale: 1.02 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            className="p-2.5 rounded-xl bg-white dark:bg-slate-800/60 border border-gray-200 dark:border-slate-700/40 shadow-xs cursor-default"
+          >
             <span className="text-gray-500 dark:text-slate-400 block text-[10px] uppercase font-bold">Starter "Set" Hold</span>
             <span className="text-base font-bold font-mono text-amber-500 dark:text-amber-400 mt-0.5 block">{holdDuration.toFixed(2)}s</span>
             <span className={`text-[10px] font-semibold ${holdCompliance.color}`}>{holdCompliance.badge}</span>
-          </div>
-          <div className="p-2.5 rounded-xl bg-white dark:bg-slate-800/60 border border-gray-200 dark:border-slate-700/40 shadow-xs">
+          </motion.div>
+          <motion.div 
+            whileHover={{ y: -2, scale: 1.02 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            className="p-2.5 rounded-xl bg-white dark:bg-slate-800/60 border border-gray-200 dark:border-slate-700/40 shadow-xs cursor-default"
+          >
             <span className="text-gray-500 dark:text-slate-400 block text-[10px] uppercase font-bold">SIS Pressure Trigger</span>
             <span className="text-base font-bold font-mono text-sky-500 dark:text-sky-400 mt-0.5 block">25 kgf (245 N)</span>
             <span className="text-[10px] text-gray-400 dark:text-slate-400">WA Sensor Specification</span>
-          </div>
+          </motion.div>
         </div>
 
         {/* Navigation Tabs */}
@@ -914,12 +950,19 @@ Standard: World Athletics Technical Rule 16.7`;
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 px-3.5 py-2.5 text-xs font-bold rounded-t-xl transition border-b-2 whitespace-nowrap ${
+                  className={`relative flex items-center gap-2 px-3.5 py-2.5 text-xs font-bold rounded-t-xl transition whitespace-nowrap z-10 ${
                     isActive 
-                      ? 'border-amber-500 text-amber-600 dark:text-amber-400 bg-white dark:bg-slate-800/80 shadow-xs' 
-                      : 'border-transparent text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-800/40'
+                      ? 'text-amber-600 dark:text-amber-400' 
+                      : 'text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-800/40'
                   }`}
                 >
+                  {isActive && (
+                    <motion.span
+                      layoutId="reactionTabPill"
+                      className="absolute inset-0 border-b-2 border-amber-500 bg-white dark:bg-slate-800/80 rounded-t-xl shadow-xs -z-10"
+                      transition={{ type: 'spring', stiffness: 350, damping: 25 }}
+                    />
+                  )}
                   <TabIcon size={14} />
                   {tab.label}
                 </button>
@@ -1282,34 +1325,40 @@ Standard: World Athletics Technical Rule 16.7`;
           </div>
 
           <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end">
-            <button
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.96 }}
               onClick={handleCopySummary}
               className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs font-bold text-gray-700 dark:text-slate-200 border border-gray-200 dark:border-slate-700 transition"
               title="Copy Audit Summary to Clipboard"
             >
               {copied ? <Check size={14} className="text-emerald-500 dark:text-emerald-400" /> : <Copy size={14} />}
               {copied ? 'Copied!' : 'Copy Summary'}
-            </button>
+            </motion.button>
 
-            <button
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.96 }}
               onClick={handleExportPDF}
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg shadow-amber-500/20 transition"
               title="Download Official World Athletics Rule TR 16.7 PDF Certificate"
             >
               <Download size={14} />
               Export WA Certificate (PDF)
-            </button>
+            </motion.button>
 
-            <button
+            <motion.button
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.96 }}
               onClick={onClose}
               className="px-4 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs font-bold text-gray-700 dark:text-slate-300 border border-gray-200 dark:border-transparent transition"
             >
               Close
-            </button>
+            </motion.button>
           </div>
         </div>
 
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

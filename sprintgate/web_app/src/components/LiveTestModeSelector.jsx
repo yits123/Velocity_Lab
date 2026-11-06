@@ -16,6 +16,7 @@
  */
 
 import React, { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { 
   Activity, Users, Repeat, Compass, Flag, Flame, 
   ChevronDown, Check, SlidersHorizontal, ArrowRight, Gauge, Zap, X
@@ -152,8 +153,10 @@ export default function LiveTestModeSelector({
       
       {/* 1. Main Test Protocol Dropdown Trigger */}
       <div className="relative">
-        <button
+        <motion.button
           type="button"
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.97 }}
           onClick={() => setIsOpen(!isOpen)}
           className={`group flex items-center gap-2 sm:gap-2.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-2xl border transition-all duration-200 shadow-sm ${
             isOpen 
@@ -179,108 +182,120 @@ export default function LiveTestModeSelector({
               />
             </div>
           </div>
-        </button>
+        </motion.button>
 
-        {/* Centered Modal Overlay for Protocol Selection */}
-        {isOpen && (
-          <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 sm:p-6">
-            {/* Screen Backdrop for Instant Focus and Click-Away Dismissal */}
-            <div 
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity animate-in fade-in duration-150"
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsOpen(false);
-              }}
-            />
+        {/* Centered Modal Overlay for Protocol Selection with AnimatePresence */}
+        <AnimatePresence>
+          {isOpen && (
+            <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 sm:p-6">
+              {/* Screen Backdrop for Instant Focus and Click-Away Dismissal */}
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.18 }}
+                className="fixed inset-0 bg-black/60 backdrop-blur-sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsOpen(false);
+                }}
+              />
 
-            <div 
-              className="relative w-full max-w-[440px] bg-white dark:bg-slate-900 border-2 border-emerald-500/50 dark:border-emerald-500/40 rounded-3xl shadow-[0_25px_80px_rgba(0,0,0,0.8)] overflow-hidden backdrop-blur-2xl animate-in fade-in zoom-in-95 duration-150 z-[121] text-gray-900 dark:text-white my-auto"
-              onClick={(e) => e.stopPropagation()}
-            >
-              
-              {/* Header info with Direct Close Button */}
-              <div className="px-4 py-3 border-b border-gray-100 dark:border-slate-800 bg-gray-50/95 dark:bg-slate-950/90 flex items-center justify-between">
-                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-gray-500 dark:text-slate-400 flex items-center gap-1.5">
-                  <SlidersHorizontal size={12} className="text-emerald-500" />
-                  Select Timing Test Discipline
-                </span>
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                    6 PROTOCOLS
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.94, y: 12 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.94, y: 12 }}
+                transition={{ type: 'spring', stiffness: 350, damping: 28 }}
+                className="relative w-full max-w-[440px] bg-white dark:bg-slate-900 border-2 border-emerald-500/50 dark:border-emerald-500/40 rounded-3xl shadow-[0_25px_80px_rgba(0,0,0,0.8)] overflow-hidden backdrop-blur-2xl z-[121] text-gray-900 dark:text-white my-auto"
+                onClick={(e) => e.stopPropagation()}
+              >
+                
+                {/* Header info with Direct Close Button */}
+                <div className="px-4 py-3 border-b border-gray-100 dark:border-slate-800 bg-gray-50/95 dark:bg-slate-950/90 flex items-center justify-between">
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-gray-500 dark:text-slate-400 flex items-center gap-1.5">
+                    <SlidersHorizontal size={12} className="text-emerald-500" />
+                    Select Timing Test Discipline
                   </span>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setIsOpen(false);
-                    }}
-                    className="p-1 rounded-lg text-gray-400 hover:text-gray-700 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-slate-800 transition"
-                    title="Close protocol menu"
-                  >
-                    <X size={15} />
-                  </button>
-                </div>
-              </div>
-
-              {/* Protocol Items List */}
-              <div className="p-2 flex flex-col gap-1 max-h-[60vh] sm:max-h-[420px] overflow-y-auto">
-                {TEST_PROTOCOLS.map((protocol) => {
-                  const isSelected = protocol.id === testMode;
-                  const Icon = protocol.icon;
-
-                  return (
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                      6 PROTOCOLS
+                    </span>
                     <button
-                      key={protocol.id}
                       type="button"
-                      onClick={() => handleSelectMode(protocol.id)}
-                      className={`group w-full flex items-start gap-3 p-2.5 rounded-2xl text-left transition-all ${
-                        isSelected
-                          ? 'bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/40 text-emerald-950 dark:text-white shadow-xs'
-                          : 'hover:bg-gray-100/80 dark:hover:bg-slate-800/80 border border-transparent text-gray-700 dark:text-gray-200'
-                      }`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsOpen(false);
+                      }}
+                      className="p-1 rounded-lg text-gray-400 hover:text-gray-700 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-slate-800 transition"
+                      title="Close protocol menu"
                     >
-                      <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 mt-0.5 transition ${
-                        isSelected
-                          ? 'bg-emerald-500 text-black shadow-[0_0_12px_rgba(16,185,129,0.4)]'
-                          : 'bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400 group-hover:text-emerald-500 group-hover:bg-emerald-500/10'
-                      }`}>
-                        <Icon size={16} />
-                      </div>
-
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between gap-1">
-                          <span className={`text-xs sm:text-sm font-extrabold truncate ${
-                            isSelected ? 'text-emerald-700 dark:text-emerald-300' : 'text-gray-900 dark:text-white'
-                          }`}>
-                            {protocol.name}
-                          </span>
-                          {isSelected && (
-                            <span className="w-5 h-5 rounded-full bg-emerald-500 text-black flex items-center justify-center shrink-0 text-xs">
-                              <Check size={12} strokeWidth={3} />
-                            </span>
-                          )}
-                        </div>
-
-                        <div className="text-[11px] text-gray-500 dark:text-slate-400 mt-0.5 line-clamp-1 leading-snug">
-                          {protocol.desc}
-                        </div>
-
-                        <div className="flex items-center gap-2 mt-1.5">
-                          <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-md bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-300 border border-gray-200 dark:border-slate-700">
-                            {protocol.badge}
-                          </span>
-                          <span className="text-[9px] font-mono text-gray-400 dark:text-slate-500">
-                            {protocol.category}
-                          </span>
-                        </div>
-                      </div>
+                      <X size={15} />
                     </button>
-                  );
-                })}
-              </div>
+                  </div>
+                </div>
+
+                {/* Protocol Items List */}
+                <div className="p-2 flex flex-col gap-1 max-h-[60vh] sm:max-h-[420px] overflow-y-auto">
+                  {TEST_PROTOCOLS.map((protocol) => {
+                    const isSelected = protocol.id === testMode;
+                    const Icon = protocol.icon;
+
+                    return (
+                      <motion.button
+                        key={protocol.id}
+                        type="button"
+                        whileHover={{ scale: 1.015, x: 3 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => handleSelectMode(protocol.id)}
+                        className={`group w-full flex items-start gap-3 p-2.5 rounded-2xl text-left transition-all ${
+                          isSelected
+                            ? 'bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/40 text-emerald-950 dark:text-white shadow-xs'
+                            : 'hover:bg-gray-100/80 dark:hover:bg-slate-800/80 border border-transparent text-gray-700 dark:text-gray-200'
+                        }`}
+                      >
+                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 mt-0.5 transition ${
+                          isSelected
+                            ? 'bg-emerald-500 text-black shadow-[0_0_12px_rgba(16,185,129,0.4)]'
+                            : 'bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400 group-hover:text-emerald-500 group-hover:bg-emerald-500/10'
+                        }`}>
+                          <Icon size={16} />
+                        </div>
+
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-1">
+                            <span className={`text-xs sm:text-sm font-extrabold truncate ${
+                              isSelected ? 'text-emerald-700 dark:text-emerald-300' : 'text-gray-900 dark:text-white'
+                            }`}>
+                              {protocol.name}
+                            </span>
+                            {isSelected && (
+                              <span className="w-5 h-5 rounded-full bg-emerald-500 text-black flex items-center justify-center shrink-0 text-xs">
+                                <Check size={12} strokeWidth={3} />
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="text-[11px] text-gray-500 dark:text-slate-400 mt-0.5 line-clamp-1 leading-snug">
+                            {protocol.desc}
+                          </div>
+
+                          <div className="flex items-center gap-2 mt-1.5">
+                            <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-md bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-300 border border-gray-200 dark:border-slate-700">
+                              {protocol.badge}
+                            </span>
+                            <span className="text-[9px] font-mono text-gray-400 dark:text-slate-500">
+                              {protocol.category}
+                            </span>
+                          </div>
+                        </div>
+                      </motion.button>
+                    );
+                  })}
+                </div>
+              </motion.div>
             </div>
-          </div>
-        )}
+          )}
+        </AnimatePresence>
       </div>
 
       {/* 2. Track Distance Quick Selector (Adjacent to Test Mode) */}

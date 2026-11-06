@@ -16,6 +16,7 @@
  */
 
 import React, { useState, useMemo } from 'react';
+import { motion } from 'motion/react';
 import { 
   Trophy, Award, Zap, Activity, Flame, Share2, 
   Download, ArrowRight, CheckCircle2, AlertCircle, Clock, 
@@ -668,7 +669,9 @@ Verified by Velocity Lab Timing System.
             </select>
           </div>
 
-          <button
+          <motion.button
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.96 }}
             onClick={handleGenerateAthleteBioReport}
             disabled={isGeneratingBioReport}
             className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs transition shadow-sm disabled:opacity-50"
@@ -677,15 +680,17 @@ Verified by Velocity Lab Timing System.
             {isGeneratingBioReport ? <RefreshCw size={14} className="animate-spin" /> : <Trophy size={14} className="text-amber-300" />}
             <span className="hidden sm:inline">{isGeneratingBioReport ? (bioReportStatus || 'Generating...') : 'Generate Athlete Bio-Report'}</span>
             <span className="sm:hidden">{isGeneratingBioReport ? 'PDF...' : 'Bio-Report'}</span>
-          </button>
+          </motion.button>
 
           {onClose && (
-            <button 
+            <motion.button 
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.92 }}
               onClick={onClose}
               className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-gray-500 hover:text-gray-900 dark:text-slate-400 dark:hover:text-white transition"
             >
               ✕
-            </button>
+            </motion.button>
           )}
         </div>
       </div>
@@ -709,45 +714,57 @@ Verified by Velocity Lab Timing System.
             <span>Height: <strong className="text-sky-600 dark:text-sky-400 font-mono">{athleteHeight} cm</strong></span>
             <span>Completed: <strong className="text-emerald-600 dark:text-emerald-400">{combineStats.completedCount} / 3 Events</strong></span>
             {(athlete?.whatsapp || athlete?.phone) && (
-              <button 
+              <motion.button 
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={handleShareWhatsApp}
                 className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-mono bg-emerald-500/10 hover:bg-emerald-500/20 px-2.5 py-1 rounded-lg border border-emerald-500/30 transition text-xs font-bold"
                 title="Open WhatsApp chat with athlete"
               >
                 <MessageSquare size={13} />
                 <span>{athlete.whatsapp || athlete.phone}</span>
-              </button>
+              </motion.button>
             )}
             {athlete?.email && (
-              <button 
+              <motion.button 
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={handleShareEmail}
                 className="flex items-center gap-1.5 text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 font-mono bg-sky-500/10 hover:bg-sky-500/20 px-2.5 py-1 rounded-lg border border-sky-500/30 transition text-xs font-bold"
                 title="Draft email to athlete"
               >
                 <Mail size={13} />
                 <span>{athlete.email}</span>
-              </button>
+              </motion.button>
             )}
           </div>
         </div>
 
         {/* Big RAS & Grade Badges */}
         <div className="flex items-center gap-4 sm:gap-6 z-10">
-          <div className="flex flex-col items-center bg-white dark:bg-slate-900/90 border border-gray-200 dark:border-slate-800 rounded-2xl p-4 sm:px-6 shadow-sm dark:shadow-lg min-w-[120px]">
+          <motion.div 
+            whileHover={{ y: -3, scale: 1.03 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            className="flex flex-col items-center bg-white dark:bg-slate-900/90 border border-gray-200 dark:border-slate-800 rounded-2xl p-4 sm:px-6 shadow-sm dark:shadow-lg min-w-[120px] cursor-default"
+          >
             <span className="text-[10px] text-gray-500 dark:text-slate-400 uppercase font-bold tracking-widest">COMBINE GRADE</span>
             <div className="text-3xl sm:text-5xl font-mono font-black text-emerald-600 dark:text-emerald-400 tracking-tight mt-1">
               {combineStats.combineGrade !== null ? combineStats.combineGrade : '--'}
               <span className="text-xs sm:text-sm text-gray-400 dark:text-slate-500 ml-0.5">/100</span>
             </div>
-          </div>
+          </motion.div>
 
-          <div className="flex flex-col items-center bg-white dark:bg-slate-900/90 border border-amber-500/40 dark:border-amber-500/30 rounded-2xl p-4 sm:px-6 shadow-sm dark:shadow-lg min-w-[120px]">
+          <motion.div 
+            whileHover={{ y: -3, scale: 1.03 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            className="flex flex-col items-center bg-white dark:bg-slate-900/90 border border-amber-500/40 dark:border-amber-500/30 rounded-2xl p-4 sm:px-6 shadow-sm dark:shadow-lg min-w-[120px] cursor-default"
+          >
             <span className="text-[10px] text-amber-600 dark:text-amber-400 uppercase font-bold tracking-widest">RAS SCORE</span>
             <div className="text-3xl sm:text-5xl font-mono font-black text-amber-500 dark:text-amber-400 tracking-tight mt-1">
               {combineStats.rasScore !== null ? combineStats.rasScore : '--'}
               <span className="text-xs sm:text-sm text-gray-400 dark:text-slate-500 ml-0.5">/10</span>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
 

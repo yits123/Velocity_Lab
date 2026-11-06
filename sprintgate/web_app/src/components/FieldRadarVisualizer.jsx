@@ -16,6 +16,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { 
   Zap, Activity, TrendingUp, Gauge, RotateCcw, Compass, 
   CheckCircle2, ArrowRight, ArrowLeft, Flag, Award, ChevronDown, ChevronUp
@@ -332,13 +333,15 @@ export default function FieldRadarVisualizer({
         </div>
 
         {metrics && (
-          <button 
+          <motion.button 
+            whileHover={{ scale: 1.04 }}
+            whileTap={{ scale: 0.96 }}
             onClick={() => setShowDeepAnalytics(!showDeepAnalytics)}
-            className="flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20 transition"
+            className="flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20 transition shadow-xs"
           >
             <span>Turn Analytics</span>
             {showDeepAnalytics ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-          </button>
+          </motion.button>
         )}
       </div>
 
@@ -381,6 +384,23 @@ export default function FieldRadarVisualizer({
             <circle cx="92" cy="24" r="5" fill="#00D084" />
             <circle cx="92" cy="164" r="5" fill="#00D084" />
             
+            {/* Active Target Laser Waveguide Beacon */}
+            {isRunning && (
+              <g>
+                <circle 
+                  cx={currentLeg % 2 === 1 ? 452 : 92} 
+                  cy={94} 
+                  r="14" 
+                  fill="none" 
+                  stroke={currentLeg % 2 === 1 ? "#38bdf8" : "#00D084"} 
+                  strokeWidth="2"
+                >
+                  <animate attributeName="r" values="8;36" dur="1.2s" repeatCount="indefinite" />
+                  <animate attributeName="opacity" values="0.9;0" dur="1.2s" repeatCount="indefinite" />
+                </circle>
+              </g>
+            )}
+
             {/* Gate A Vertical Title (Well clear on outer left margin at x=24) */}
             <text x="24" y="94" fill="#00D084" fontSize="9.5" fontWeight="900" textAnchor="middle" transform="rotate(-90 24 94)" letterSpacing="1.5">
               0m START / FINISH
@@ -588,6 +608,23 @@ export default function FieldRadarVisualizer({
             <rect x="455" y="24" width="40" height="16" rx="4" fill={isDark ? "#0f172a" : "#ffffff"} stroke="#f59e0b" strokeWidth="1" />
             <text x="475" y="35" fill="#f59e0b" fontSize="8" fontWeight="bold" textAnchor="middle">+5 YD RIGHT</text>
 
+            {/* Active Target Laser Beacon */}
+            {isRunning && (
+              <g>
+                <circle 
+                  cx={currentLeg === 1 ? 475 : currentLeg === 2 ? 85 : 280} 
+                  cy={92} 
+                  r="14" 
+                  fill="none" 
+                  stroke={currentLeg === 1 ? "#f59e0b" : currentLeg === 2 ? "#38bdf8" : "#00D084"} 
+                  strokeWidth="2"
+                >
+                  <animate attributeName="r" values="8;36" dur="1.1s" repeatCount="indefinite" />
+                  <animate attributeName="opacity" values="0.9;0" dur="1.1s" repeatCount="indefinite" />
+                </circle>
+              </g>
+            )}
+
             {/* Sector 1: Center -> Right (y=62) */}
             {(() => {
               const isPast = splitsCount >= 1;
@@ -767,6 +804,23 @@ export default function FieldRadarVisualizer({
             <text x="300" y="49" fill="#000" fontSize="9" fontWeight="bold" textAnchor="middle">C3</text>
             <text x="300" y="28" fill="#f59e0b" fontSize="8" fontWeight="bold" textAnchor="middle">CONE 3 (5 YD)</text>
 
+            {/* Active Target Cone Ripple Beacon */}
+            {isRunning && (
+              <g>
+                <circle 
+                  cx={currentLeg === 1 ? 300 : currentLeg === 2 ? 300 : 100} 
+                  cy={currentLeg === 1 ? 135 : currentLeg === 2 ? 45 : 135} 
+                  r="14" 
+                  fill="none" 
+                  stroke={currentLeg === 1 ? "#f59e0b" : currentLeg === 2 ? "#38bdf8" : "#00D084"} 
+                  strokeWidth="2.5"
+                >
+                  <animate attributeName="r" values="10;34" dur="1.1s" repeatCount="indefinite" />
+                  <animate attributeName="opacity" values="0.9;0" dur="1.1s" repeatCount="indefinite" />
+                </circle>
+              </g>
+            )}
+
             {/* Sector 1: Cone 1 -> Cone 2 Touch -> Return to Cone 1 */}
             {(() => {
               const isPast = splitsCount >= 1;
@@ -923,9 +977,11 @@ export default function FieldRadarVisualizer({
           }
 
           return (
-            <div 
+            <motion.div 
               key={leg} 
-              className={`rounded-2xl p-3 border transition-all duration-300 flex flex-col justify-between ${
+              whileHover={{ y: -2, scale: 1.02 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+              className={`rounded-2xl p-3 border transition-all duration-300 flex flex-col justify-between cursor-default ${
                 isDone 
                   ? 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-400 dark:border-[#00D084] shadow-sm' 
                   : isCur 
@@ -950,76 +1006,84 @@ export default function FieldRadarVisualizer({
                   </div>
                 )}
               </div>
-            </div>
+            </motion.div>
           );
         })}
       </div>
 
       {/* Biomechanical Turn Analytics & Symmetry Scorecard (Shown on completion or historical inspect) */}
-      {metrics && showDeepAnalytics && (
-        <div className="bg-slate-50 dark:bg-slate-950/70 border border-gray-200 dark:border-slate-800 rounded-2xl p-4 sm:p-5 flex flex-col gap-4 animate-in fade-in duration-300 shadow-sm">
-          <div className="flex items-center justify-between border-b border-gray-200 dark:border-slate-800 pb-2">
-            <div className="text-xs font-bold text-gray-700 dark:text-slate-300 tracking-wider uppercase flex items-center gap-2">
-              <Activity size={15} className="text-[#00D084]" />
-              Biomechanical Turn & Agility Assessment
-            </div>
-            <div className="text-[11px] font-mono text-emerald-600 dark:text-emerald-400 font-bold">
-              Total: {metrics.totalTime}s
-            </div>
-          </div>
-
-          {/* Core Agility Metrics Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-            <div className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-3 rounded-xl flex flex-col justify-between shadow-sm">
-              <div className="text-[10px] text-gray-500 dark:text-slate-400 font-bold uppercase">COD DEFICIT</div>
-              <div className="text-lg font-mono font-bold text-amber-500 dark:text-yellow-400 mt-1">+{metrics.codDeficit}s</div>
-              <div className="text-[10px] text-gray-400 dark:text-slate-500 mt-0.5">Vs Pure Linear 40m</div>
-            </div>
-
-            <div className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-3 rounded-xl flex flex-col justify-between shadow-sm">
-              <div className="text-[10px] text-gray-500 dark:text-slate-400 font-bold uppercase">TURN OVERHEAD</div>
-              <div className="text-lg font-mono font-bold text-emerald-600 dark:text-emerald-400 mt-1">+{metrics.turnOverhead}s</div>
-              <div className="text-[10px] text-gray-400 dark:text-slate-500 mt-0.5">Avg Brake Loss / Turn</div>
-            </div>
-
-            <div className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-3 rounded-xl flex flex-col justify-between shadow-sm">
-              <div className="text-[10px] text-gray-500 dark:text-slate-400 font-bold uppercase">LATERAL SYMMETRY</div>
-              <div className={`text-lg font-mono font-bold mt-1 ${metrics.lateralBalanceColor}`}>{metrics.symmetryRatio}%</div>
-              <div className="text-[10px] text-gray-400 dark:text-slate-500 mt-0.5">{metrics.lateralBalanceRating}</div>
-            </div>
-
-            <div className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-3 rounded-xl flex flex-col justify-between shadow-sm">
-              <div className="text-[10px] text-gray-500 dark:text-slate-400 font-bold uppercase">FATIGUE DECAY</div>
-              <div className="text-lg font-mono font-bold text-sky-600 dark:text-sky-400 mt-1">{parseFloat(metrics.fatigueDecayPct) > 0 ? `+${metrics.fatigueDecayPct}%` : `${metrics.fatigueDecayPct}%`}</div>
-              <div className="text-[10px] text-gray-400 dark:text-slate-500 mt-0.5">Leg 1 vs Leg 3 Drop-off</div>
-            </div>
-          </div>
-
-          {/* Turn-by-Turn Deceleration vs Re-Acceleration Table */}
-          {metrics.turn1 && (
-            <div className="bg-white dark:bg-slate-900/90 border border-gray-200 dark:border-slate-800 rounded-xl overflow-hidden mt-1 shadow-sm">
-              <div className="px-3 py-2 bg-gray-100 dark:bg-slate-800/50 border-b border-gray-200 dark:border-slate-800 text-[11px] font-bold text-gray-700 dark:text-slate-300 uppercase tracking-wider flex justify-between">
-                <span>Turn Breakdown</span>
-                <span className="text-gray-500 dark:text-slate-400">Decel (Braking) vs Re-Accel (Drive-Out)</span>
+      <AnimatePresence>
+        {metrics && showDeepAnalytics && (
+          <motion.div 
+            initial={{ opacity: 0, height: 0, y: -10 }}
+            animate={{ opacity: 1, height: 'auto', y: 0 }}
+            exit={{ opacity: 0, height: 0, y: -10 }}
+            transition={{ duration: 0.25 }}
+            className="bg-slate-50 dark:bg-slate-950/70 border border-gray-200 dark:border-slate-800 rounded-2xl p-4 sm:p-5 flex flex-col gap-4 shadow-sm overflow-hidden"
+          >
+            <div className="flex items-center justify-between border-b border-gray-200 dark:border-slate-800 pb-2">
+              <div className="text-xs font-bold text-gray-700 dark:text-slate-300 tracking-wider uppercase flex items-center gap-2">
+                <Activity size={15} className="text-[#00D084]" />
+                Biomechanical Turn & Agility Assessment
               </div>
-              <div className="divide-y divide-gray-200 dark:divide-slate-800/60 text-xs font-mono">
-                {[metrics.turn1, metrics.turn2, metrics.turn3].filter(Boolean).map((t, idx) => (
-                  <div key={idx} className="p-2.5 flex items-center justify-between">
-                    <span className="text-gray-800 dark:text-slate-300 font-sans font-medium">{t.name}</span>
-                    <div className="flex items-center gap-4">
-                      <span className="text-amber-500 dark:text-amber-400 font-bold">Brake: {t.decel}s</span>
-                      <span className="text-gray-400 dark:text-slate-600">|</span>
-                      <span className="text-emerald-600 dark:text-emerald-400 font-bold">Drive: {t.reaccel}s</span>
-                      <span className="text-gray-400 dark:text-slate-600">|</span>
-                      <span className="text-gray-900 dark:text-white font-bold">Total: {t.total}s</span>
+              <div className="text-[11px] font-mono text-emerald-600 dark:text-emerald-400 font-bold">
+                Total: {metrics.totalTime}s
+              </div>
+            </div>
+
+            {/* Core Agility Metrics Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+              <div className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-3 rounded-xl flex flex-col justify-between shadow-sm">
+                <div className="text-[10px] text-gray-500 dark:text-slate-400 font-bold uppercase">COD DEFICIT</div>
+                <div className="text-lg font-mono font-bold text-amber-500 dark:text-yellow-400 mt-1">+{metrics.codDeficit}s</div>
+                <div className="text-[10px] text-gray-400 dark:text-slate-500 mt-0.5">Vs Pure Linear 40m</div>
+              </div>
+
+              <div className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-3 rounded-xl flex flex-col justify-between shadow-sm">
+                <div className="text-[10px] text-gray-500 dark:text-slate-400 font-bold uppercase">TURN OVERHEAD</div>
+                <div className="text-lg font-mono font-bold text-emerald-600 dark:text-emerald-400 mt-1">+{metrics.turnOverhead}s</div>
+                <div className="text-[10px] text-gray-400 dark:text-slate-500 mt-0.5">Avg Brake Loss / Turn</div>
+              </div>
+
+              <div className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-3 rounded-xl flex flex-col justify-between shadow-sm">
+                <div className="text-[10px] text-gray-500 dark:text-slate-400 font-bold uppercase">LATERAL SYMMETRY</div>
+                <div className={`text-lg font-mono font-bold mt-1 ${metrics.lateralBalanceColor}`}>{metrics.symmetryRatio}%</div>
+                <div className="text-[10px] text-gray-400 dark:text-slate-500 mt-0.5">{metrics.lateralBalanceRating}</div>
+              </div>
+
+              <div className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-3 rounded-xl flex flex-col justify-between shadow-sm">
+                <div className="text-[10px] text-gray-500 dark:text-slate-400 font-bold uppercase">FATIGUE DECAY</div>
+                <div className="text-lg font-mono font-bold text-sky-600 dark:text-sky-400 mt-1">{parseFloat(metrics.fatigueDecayPct) > 0 ? `+${metrics.fatigueDecayPct}%` : `${metrics.fatigueDecayPct}%`}</div>
+                <div className="text-[10px] text-gray-400 dark:text-slate-500 mt-0.5">Leg 1 vs Leg 3 Drop-off</div>
+              </div>
+            </div>
+
+            {/* Turn-by-Turn Deceleration vs Re-Acceleration Table */}
+            {metrics.turn1 && (
+              <div className="bg-white dark:bg-slate-900/90 border border-gray-200 dark:border-slate-800 rounded-xl overflow-hidden mt-1 shadow-sm">
+                <div className="px-3 py-2 bg-gray-100 dark:bg-slate-800/50 border-b border-gray-200 dark:border-slate-800 text-[11px] font-bold text-gray-700 dark:text-slate-300 uppercase tracking-wider flex justify-between">
+                  <span>Turn Breakdown</span>
+                  <span className="text-gray-500 dark:text-slate-400">Decel (Braking) vs Re-Accel (Drive-Out)</span>
+                </div>
+                <div className="divide-y divide-gray-200 dark:divide-slate-800/60 text-xs font-mono">
+                  {[metrics.turn1, metrics.turn2, metrics.turn3].filter(Boolean).map((t, idx) => (
+                    <div key={idx} className="p-2.5 flex items-center justify-between">
+                      <span className="text-gray-800 dark:text-slate-300 font-sans font-medium">{t.name}</span>
+                      <div className="flex items-center gap-4">
+                        <span className="text-amber-500 dark:text-amber-400 font-bold">Brake: {t.decel}s</span>
+                        <span className="text-gray-400 dark:text-slate-600">|</span>
+                        <span className="text-emerald-600 dark:text-emerald-400 font-bold">Drive: {t.reaccel}s</span>
+                        <span className="text-gray-400 dark:text-slate-600">|</span>
+                        <span className="text-gray-900 dark:text-white font-bold">Total: {t.total}s</span>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
-        </div>
-      )}
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

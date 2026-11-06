@@ -16,6 +16,7 @@
  */
 
 import React, { useMemo, useState, useEffect } from 'react';
+import { motion } from 'motion/react';
 import { 
   Zap, Activity, Dumbbell, TrendingUp, Sliders, 
   HelpCircle, ChevronRight, Award, Gauge, ArrowRight,
@@ -165,21 +166,27 @@ function FVPProfileCard({
 
         <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
           {onOpenFullModal && (
-            <button
+            <motion.button
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.96 }}
               onClick={onOpenFullModal}
               className="px-3.5 py-1.5 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-700 dark:text-cyan-300 text-xs font-bold transition flex items-center gap-1.5 shadow-xs"
               title="Open full interactive FVP report modal with PDF export"
             >
               <Maximize2 size={13} />
               <span>Full Dossier</span>
-            </button>
+            </motion.button>
           )}
         </div>
       </div>
       {/* 4 Primary Sports Science Biomarkers */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 z-10">
         {/* F0 */}
-        <div className="bg-gray-50 dark:bg-slate-950/70 border border-gray-200 dark:border-slate-800/90 rounded-2xl p-3.5 flex flex-col justify-between shadow-xs">
+        <motion.div 
+          whileHover={{ y: -3, scale: 1.015 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+          className="bg-gray-50 dark:bg-slate-950/70 border border-gray-200 dark:border-slate-800/90 rounded-2xl p-3.5 flex flex-col justify-between shadow-xs cursor-default"
+        >
           <div className="flex items-center justify-between text-xs text-gray-500 dark:text-slate-400 font-bold uppercase tracking-wider">
             <span>F₀ (Max Force)</span>
             <span className="text-[10px] text-cyan-600 dark:text-cyan-400 font-mono">v = 0</span>
@@ -193,10 +200,14 @@ function FVPProfileCard({
           <div className="text-[10px] font-mono text-gray-500 dark:text-slate-500">
             Total: {fvp.f0} N
           </div>
-        </div>
+        </motion.div>
 
         {/* V0 */}
-        <div className="bg-gray-50 dark:bg-slate-950/70 border border-gray-200 dark:border-slate-800/90 rounded-2xl p-3.5 flex flex-col justify-between shadow-xs">
+        <motion.div 
+          whileHover={{ y: -3, scale: 1.015 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+          className="bg-gray-50 dark:bg-slate-950/70 border border-gray-200 dark:border-slate-800/90 rounded-2xl p-3.5 flex flex-col justify-between shadow-xs cursor-default"
+        >
           <div className="flex items-center justify-between text-xs text-gray-500 dark:text-slate-400 font-bold uppercase tracking-wider">
             <span>V₀ (Max Speed)</span>
             <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-mono">F = 0</span>
@@ -210,10 +221,14 @@ function FVPProfileCard({
           <div className="text-[10px] font-mono text-gray-500 dark:text-slate-500">
             {fvp.v0Kmh} km/h
           </div>
-        </div>
+        </motion.div>
 
         {/* Pmax */}
-        <div className="bg-gray-50 dark:bg-slate-950/70 border border-gray-200 dark:border-slate-800/90 rounded-2xl p-3.5 flex flex-col justify-between shadow-xs">
+        <motion.div 
+          whileHover={{ y: -3, scale: 1.015 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+          className="bg-gray-50 dark:bg-slate-950/70 border border-gray-200 dark:border-slate-800/90 rounded-2xl p-3.5 flex flex-col justify-between shadow-xs cursor-default"
+        >
           <div className="flex items-center justify-between text-xs text-gray-500 dark:text-slate-400 font-bold uppercase tracking-wider">
             <span>Pₘₐₓ (Peak Power)</span>
             <span className="text-[10px] text-purple-600 dark:text-purple-400 font-mono">Theoretical</span>
@@ -227,10 +242,14 @@ function FVPProfileCard({
           <div className="text-[10px] font-mono text-gray-500 dark:text-slate-500">
             Total: {fvp.pmax} W
           </div>
-        </div>
+        </motion.div>
 
         {/* RF Peak & DRF */}
-        <div className="bg-gray-50 dark:bg-slate-950/70 border border-gray-200 dark:border-slate-800/90 rounded-2xl p-3.5 flex flex-col justify-between shadow-xs">
+        <motion.div 
+          whileHover={{ y: -3, scale: 1.015 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+          className="bg-gray-50 dark:bg-slate-950/70 border border-gray-200 dark:border-slate-800/90 rounded-2xl p-3.5 flex flex-col justify-between shadow-xs cursor-default"
+        >
           <div className="flex items-center justify-between text-xs text-gray-500 dark:text-slate-400 font-bold uppercase tracking-wider">
             <span>RFₘₐₓ / D_RF</span>
             <span className="text-[10px] text-amber-600 dark:text-amber-400 font-mono">Effectiveness</span>
@@ -252,7 +271,7 @@ function FVPProfileCard({
           <div className="text-[10px] font-mono text-gray-500 dark:text-slate-500">
             Technique Slope
           </div>
-        </div>
+        </motion.div>
       </div>
 
       {/* Main Scatter & Regression Chart Container */}
@@ -263,25 +282,34 @@ function FVPProfileCard({
             <span>F-v Linear Line & P-v Parabola with Acceleration Splits</span>
           </div>
           
-          <div className="flex bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-xl p-0.5 text-xs font-mono shadow-xs">
-            <button
-              onClick={() => setActiveCurveView('both')}
-              className={`px-2.5 py-1 rounded-lg font-bold transition ${activeCurveView === 'both' ? 'bg-cyan-500/15 text-cyan-700 dark:text-cyan-300 font-extrabold' : 'text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white'}`}
-            >
-              F-v + P-v
-            </button>
-            <button
-              onClick={() => setActiveCurveView('fv')}
-              className={`px-2.5 py-1 rounded-lg font-bold transition ${activeCurveView === 'fv' ? 'bg-cyan-500/15 text-cyan-700 dark:text-cyan-300 font-extrabold' : 'text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white'}`}
-            >
-              F-v Only
-            </button>
-            <button
-              onClick={() => setActiveCurveView('pv')}
-              className={`px-2.5 py-1 rounded-lg font-bold transition ${activeCurveView === 'pv' ? 'bg-purple-500/15 text-purple-700 dark:text-purple-300 font-extrabold' : 'text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white'}`}
-            >
-              P-v Only
-            </button>
+          <div className="flex bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-xl p-0.5 text-xs font-mono shadow-xs relative">
+            {[
+              { id: 'both', label: 'F-v + P-v', activeColor: 'text-cyan-700 dark:text-cyan-300' },
+              { id: 'fv', label: 'F-v Only', activeColor: 'text-cyan-700 dark:text-cyan-300' },
+              { id: 'pv', label: 'P-v Only', activeColor: 'text-purple-700 dark:text-purple-300' }
+            ].map(tab => {
+              const isSelected = activeCurveView === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveCurveView(tab.id)}
+                  className={`relative px-2.5 py-1 rounded-lg font-bold transition z-10 ${
+                    isSelected 
+                      ? `${tab.activeColor} font-extrabold` 
+                      : 'text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white'
+                  }`}
+                >
+                  {isSelected && (
+                    <motion.span
+                      layoutId="fvpCurveViewPill"
+                      className={`absolute inset-0 rounded-lg ${tab.id === 'pv' ? 'bg-purple-500/15' : 'bg-cyan-500/15'} -z-10`}
+                      transition={{ type: 'spring', stiffness: 350, damping: 25 }}
+                    />
+                  )}
+                  {tab.label}
+                </button>
+              );
+            })}
           </div>
         </div>
 
@@ -432,7 +460,11 @@ function FVPProfileCard({
 
           <div className="grid grid-cols-3 gap-2 text-center">
             {/* Heavy Force */}
-            <div className="bg-white dark:bg-slate-900/90 border border-rose-200 dark:border-rose-500/30 rounded-xl p-2.5 shadow-xs">
+            <motion.div 
+              whileHover={{ y: -2, scale: 1.02 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+              className="bg-white dark:bg-slate-900/90 border border-rose-200 dark:border-rose-500/30 rounded-xl p-2.5 shadow-xs cursor-default"
+            >
               <div className="text-[10px] font-mono font-bold text-rose-600 dark:text-rose-400 uppercase">
                 50% Vdec (F₀)
               </div>
@@ -442,10 +474,14 @@ function FVPProfileCard({
               <div className="text-[9px] text-gray-500 dark:text-slate-400 mt-0.5">
                 Block Exit Drive
               </div>
-            </div>
+            </motion.div>
 
             {/* Power Output */}
-            <div className="bg-white dark:bg-slate-900/90 border border-amber-200 dark:border-amber-500/30 rounded-xl p-2.5 shadow-xs">
+            <motion.div 
+              whileHover={{ y: -2, scale: 1.02 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+              className="bg-white dark:bg-slate-900/90 border border-amber-200 dark:border-amber-500/30 rounded-xl p-2.5 shadow-xs cursor-default"
+            >
               <div className="text-[10px] font-mono font-bold text-amber-600 dark:text-amber-400 uppercase">
                 25% Vdec (Pₘₐₓ)
               </div>
@@ -455,10 +491,14 @@ function FVPProfileCard({
               <div className="text-[9px] text-gray-500 dark:text-slate-400 mt-0.5">
                 Peak Accel Power
               </div>
-            </div>
+            </motion.div>
 
             {/* Speed Transfer */}
-            <div className="bg-white dark:bg-slate-900/90 border border-emerald-200 dark:border-emerald-500/30 rounded-xl p-2.5 shadow-xs">
+            <motion.div 
+              whileHover={{ y: -2, scale: 1.02 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+              className="bg-white dark:bg-slate-900/90 border border-emerald-200 dark:border-emerald-500/30 rounded-xl p-2.5 shadow-xs cursor-default"
+            >
               <div className="text-[10px] font-mono font-bold text-emerald-600 dark:text-emerald-400 uppercase">
                 10% Vdec (V₀)
               </div>
@@ -468,7 +508,7 @@ function FVPProfileCard({
               <div className="text-[9px] text-gray-500 dark:text-slate-400 mt-0.5">
                 Max Speed Fly
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </div>

@@ -16,6 +16,7 @@
  */
 
 import React, { useState, useMemo, useEffect } from 'react';
+import { motion } from 'motion/react';
 import { 
   Zap, Activity, Trophy, TrendingUp, TrendingDown, Award, 
   Shield, Download, Share2, FileText, X, ChevronRight, 
@@ -569,20 +570,32 @@ export default function AthleteScoutCardModal({
   };
 
   return (
-    <div 
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-md p-3 sm:p-5 select-none"
       onClick={onClose}
     >
-      <div 
-        className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-3xl w-full max-w-4xl overflow-hidden shadow-2xl flex flex-col max-h-[92vh] text-gray-900 dark:text-slate-100 relative animate-in fade-in duration-200"
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.94, y: 16 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.94, y: 16 }}
+        transition={{ type: 'spring', stiffness: 340, damping: 28 }}
+        className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-3xl w-full max-w-4xl overflow-hidden shadow-2xl flex flex-col max-h-[92vh] text-gray-900 dark:text-slate-100 relative"
         onClick={e => e.stopPropagation()}
       >
         {/* Modal Top Header Banner */}
         <div className="p-5 sm:p-7 border-b border-gray-200 dark:border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-gradient-to-r from-gray-50 via-white to-gray-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-black flex items-center justify-center font-black text-xl shadow-[0_0_20px_rgba(16,185,129,0.3)] border-2 border-white/40 dark:border-white/20">
+            <motion.div 
+              whileHover={{ rotate: [0, -5, 5, 0], scale: 1.05 }}
+              transition={{ duration: 0.4 }}
+              className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-black flex items-center justify-center font-black text-xl shadow-[0_0_20px_rgba(16,185,129,0.3)] border-2 border-white/40 dark:border-white/20 shrink-0"
+            >
               {athleteMeta.name.substring(0, 2).toUpperCase()}
-            </div>
+            </motion.div>
             <div>
               <div className="text-[10px] font-mono font-bold text-emerald-600 dark:text-emerald-400 tracking-widest uppercase flex items-center gap-2">
                 <VelocityLabLogo variant="icon" className="h-4 w-4" />
@@ -611,17 +624,21 @@ export default function AthleteScoutCardModal({
           {/* Action Buttons */}
           <div className="flex items-center gap-2 w-full sm:w-auto justify-end flex-wrap">
             {onOpenFvp && (
-              <button
+              <motion.button
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.96 }}
                 onClick={() => onOpenFvp(athleteRuns[athleteRuns.length - 1] || null)}
                 className="flex items-center gap-1.5 px-3 py-2 bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-black font-black text-xs uppercase tracking-wider rounded-xl transition shadow-md shadow-emerald-500/20"
                 title="Open Samozino/Morin Horizontal Force-Velocity-Power Profile"
               >
                 <Activity size={14} />
                 <span>F-v-P Profile</span>
-              </button>
+              </motion.button>
             )}
 
-            <button
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.96 }}
               onClick={handleGenerateAthleteBioReport}
               disabled={isGeneratingBioReport}
               className="flex items-center gap-1.5 px-3 py-2 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-400 hover:via-teal-400 hover:to-cyan-400 text-black font-black text-xs uppercase tracking-wider rounded-xl transition shadow-md shadow-emerald-500/25 active:scale-95 disabled:opacity-50"
@@ -638,24 +655,28 @@ export default function AthleteScoutCardModal({
                   <span>Generate Athlete Bio-Report</span>
                 </>
               )}
-            </button>
+            </motion.button>
 
-            <button
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.96 }}
               onClick={handleExportScoutPDF}
               className="flex items-center gap-1.5 px-3 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-gray-800 dark:text-slate-200 hover:text-gray-900 dark:hover:text-white border border-gray-200 dark:border-slate-700 rounded-xl text-xs font-bold transition shadow-sm"
               title="Download Scout Dossier PDF"
             >
               <Download size={14} />
               <span>Scout PDF</span>
-            </button>
+            </motion.button>
 
-            <button 
+            <motion.button 
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.92 }}
               onClick={onClose} 
               className="p-2 text-gray-500 hover:text-gray-900 dark:text-slate-400 dark:hover:text-white bg-gray-100 hover:bg-gray-200 dark:bg-slate-800/80 dark:hover:bg-slate-800 rounded-xl transition border border-gray-200 dark:border-slate-700/80 shadow-sm"
               title="Close Profile"
             >
               <X size={18} />
-            </button>
+            </motion.button>
           </div>
         </div>
 
@@ -664,12 +685,20 @@ export default function AthleteScoutCardModal({
           
           {/* Top Quick Stats Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
-            <div className="bg-gray-50 dark:bg-slate-950/80 border border-gray-200 dark:border-slate-800 p-3.5 rounded-2xl text-center shadow-xs">
+            <motion.div 
+              whileHover={{ y: -3, scale: 1.02 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+              className="bg-gray-50 dark:bg-slate-950/80 border border-gray-200 dark:border-slate-800 p-3.5 rounded-2xl text-center shadow-xs"
+            >
               <div className="text-[10px] text-gray-500 dark:text-slate-400 font-bold tracking-wider uppercase mb-0.5">TOTAL RUNS</div>
               <div className="text-2xl font-black text-gray-900 dark:text-white">{athleteRuns.length}</div>
-            </div>
+            </motion.div>
 
-            <div className="bg-emerald-500/10 border border-emerald-500/30 p-3.5 rounded-2xl text-center shadow-[0_0_15px_rgba(16,185,129,0.1)]">
+            <motion.div 
+              whileHover={{ y: -3, scale: 1.02 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+              className="bg-emerald-500/10 border border-emerald-500/30 p-3.5 rounded-2xl text-center shadow-[0_0_15px_rgba(16,185,129,0.1)]"
+            >
               <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold tracking-wider uppercase mb-0.5">PERSONAL BEST</div>
               <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400 font-mono">
                 {personalBest !== '--' ? `${personalBest}s` : '--'}
@@ -677,27 +706,43 @@ export default function AthleteScoutCardModal({
               <span className="text-[9px] text-emerald-700/80 dark:text-emerald-400/80 font-mono block truncate" title={bestRunDistance}>
                 {bestRunDistance || 'No Runs'}
               </span>
-            </div>
+            </motion.div>
 
-            <div className="bg-gray-50 dark:bg-slate-950/80 border border-gray-200 dark:border-slate-800 p-3.5 rounded-2xl text-center shadow-xs">
+            <motion.div 
+              whileHover={{ y: -3, scale: 1.02 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+              className="bg-gray-50 dark:bg-slate-950/80 border border-gray-200 dark:border-slate-800 p-3.5 rounded-2xl text-center shadow-xs"
+            >
               <div className="text-[10px] text-gray-500 dark:text-slate-400 font-bold tracking-wider uppercase mb-0.5">TOP VELOCITY</div>
               <div className="text-2xl font-black text-gray-900 dark:text-white font-mono">{topVel > 0 ? `${topVel.toFixed(2)}` : '--'}</div>
               <span className="text-[9px] text-gray-400 dark:text-slate-500 font-mono">m/s</span>
-            </div>
+            </motion.div>
 
-            <div className="bg-gray-50 dark:bg-slate-950/80 border border-gray-200 dark:border-slate-800 p-3.5 rounded-2xl text-center shadow-xs">
+            <motion.div 
+              whileHover={{ y: -3, scale: 1.02 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+              className="bg-gray-50 dark:bg-slate-950/80 border border-gray-200 dark:border-slate-800 p-3.5 rounded-2xl text-center shadow-xs"
+            >
               <div className="text-[10px] text-gray-500 dark:text-slate-400 font-bold tracking-wider uppercase mb-0.5">MOMENTUM</div>
               <div className="text-2xl font-black text-gray-900 dark:text-white font-mono">{peakMomentum}</div>
               <span className="text-[9px] text-gray-400 dark:text-slate-500 font-mono">{peakMomentum !== '--' ? 'kg·m/s' : 'Req Weight'}</span>
-            </div>
+            </motion.div>
 
-            <div className="bg-gray-50 dark:bg-slate-950/80 border border-gray-200 dark:border-slate-800 p-3.5 rounded-2xl text-center shadow-xs">
+            <motion.div 
+              whileHover={{ y: -3, scale: 1.02 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+              className="bg-gray-50 dark:bg-slate-950/80 border border-gray-200 dark:border-slate-800 p-3.5 rounded-2xl text-center shadow-xs"
+            >
               <div className="text-[10px] text-gray-500 dark:text-slate-400 font-bold tracking-wider uppercase mb-0.5">EST. POWER</div>
               <div className="text-2xl font-black text-gray-900 dark:text-white font-mono">{avgPower}</div>
               <span className="text-[9px] text-gray-400 dark:text-slate-500 font-mono">{avgPower !== '--' ? 'Watts' : 'Req Weight'}</span>
-            </div>
+            </motion.div>
 
-            <div className="bg-amber-500/10 border border-amber-500/30 p-3.5 rounded-2xl text-center shadow-[0_0_15px_rgba(251,191,36,0.1)]">
+            <motion.div 
+              whileHover={{ y: -3, scale: 1.02 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+              className="bg-amber-500/10 border border-amber-500/30 p-3.5 rounded-2xl text-center shadow-[0_0_15px_rgba(251,191,36,0.1)]"
+            >
               <div className="text-[10px] text-amber-600 dark:text-amber-400 font-bold tracking-wider uppercase mb-0.5">SCOUT INDEX</div>
               <div className="text-2xl font-black text-amber-600 dark:text-amber-400 font-mono">
                 {compositeIndex !== null ? compositeIndex : '--'}
@@ -705,7 +750,7 @@ export default function AthleteScoutCardModal({
               <span className="text-[9px] text-amber-600/80 dark:text-amber-400/80 font-bold uppercase">
                 {testedCount === 5 ? 'Tier 1 Target' : testedCount > 0 ? `${testedCount}/5 Tested` : 'Untested'}
               </span>
-            </div>
+            </motion.div>
           </div>
 
           {/* Section: 5-Pillar Spider Radar Chart + Personal Records Showcase */}
@@ -780,7 +825,10 @@ export default function AthleteScoutCardModal({
                   />
 
                   {/* Athlete Polygon */}
-                  <polygon 
+                  <motion.polygon 
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ type: 'spring', stiffness: 280, damping: 22 }}
                     points={radarGeometry.athletePoints} 
                     fill={isDark ? "rgba(16, 185, 129, 0.25)" : "rgba(16, 185, 129, 0.2)"} 
                     stroke="#10b981" 
@@ -796,8 +844,11 @@ export default function AthleteScoutCardModal({
                     const x = radarGeometry.cx + r * Math.cos(angle);
                     const y = radarGeometry.cy + r * Math.sin(angle);
                     return (
-                      <circle 
+                      <motion.circle 
                         key={i} 
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ delay: 0.15 + i * 0.05, type: 'spring', stiffness: 350, damping: 20 }}
                         cx={x} 
                         cy={y} 
                         r="4" 
@@ -813,12 +864,17 @@ export default function AthleteScoutCardModal({
               {/* Pillar Score Breakdown Bar */}
               <div className="grid grid-cols-5 gap-1.5 pt-3 border-t border-gray-200 dark:border-slate-800 text-center">
                 {radarScores.map((p, idx) => (
-                  <div key={idx} className="bg-white dark:bg-slate-900 rounded-xl p-1.5 border border-gray-200 dark:border-slate-800 shadow-xs">
+                  <motion.div 
+                    key={idx} 
+                    whileHover={{ y: -2, scale: 1.03 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                    className="bg-white dark:bg-slate-900 rounded-xl p-1.5 border border-gray-200 dark:border-slate-800 shadow-xs cursor-default"
+                  >
                     <div className="text-[9px] font-bold text-gray-500 dark:text-slate-400 truncate" title={p.label}>{p.name}</div>
                     <div className={`text-xs font-mono font-black ${p.score !== null ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400 dark:text-slate-500'}`}>
                       {p.score !== null ? p.score : 'N/T'}
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             </div>
@@ -1038,7 +1094,9 @@ export default function AthleteScoutCardModal({
             </div>
 
             <div className="z-10 w-full md:w-auto shrink-0 flex flex-col items-center gap-2">
-              <button
+              <motion.button
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.96 }}
                 onClick={handleGenerateAthleteBioReport}
                 disabled={isGeneratingBioReport}
                 className="w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-400 hover:from-emerald-400 hover:via-teal-300 hover:to-cyan-300 text-black font-black text-sm uppercase tracking-wider rounded-2xl transition shadow-xl shadow-emerald-500/30 flex items-center justify-center gap-2.5 active:scale-95 disabled:opacity-50"
@@ -1054,7 +1112,7 @@ export default function AthleteScoutCardModal({
                     <span>Generate Athlete Bio-Report</span>
                   </>
                 )}
-              </button>
+              </motion.button>
               <span className="text-[10px] font-mono text-slate-500 text-center">
                 Format: Official Multi-Page A4 PDF • 300 DPI High-Res
               </span>
@@ -1062,7 +1120,7 @@ export default function AthleteScoutCardModal({
           </div>
 
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
