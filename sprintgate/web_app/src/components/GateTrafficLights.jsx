@@ -16,19 +16,17 @@
  */
 
 import React from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Activity, Radio, Zap, CheckCircle2, AlertTriangle, ShieldAlert, Usb, Bluetooth, Wifi, Sliders } from 'lucide-react';
 
 /**
  * GateTrafficLights.jsx (Revamped to Olympic Laser Gate Telemetry Hub)
  * Sleek, high-tech athletic photocell gate telemetry indicator:
- * - Start Photocell Pod (Start Gate • 0m)
- * - Animated Laser Interconnect Waveguide
+ * - Start Photocell Pod (Start Gate • 0m) with spring haptics
+ * - Animated Laser Interconnect Waveguide with streaming photon pulse
  * - Finish Photocell Pod (Finish Gate • Distance)
  * - Sub-millisecond Hardware Sync Gateway Status (Gate Link)
  * - Multi-Modal Hardware Settings & Connection Hub (USB-C, BLE, Wi-Fi)
- * 
- * Re-architected to a ultra-compact vertical structure (Icons above, names below)
- * to prevent multi-line wrapping and layout overflow on tablets, mobile and desktop.
  */
 function GateTrafficLights({
   statusA = { online: false, beam_broken: false },
@@ -65,20 +63,23 @@ function GateTrafficLights({
   };
 
   return (
-    <div className={`w-full flex justify-center mb-2 sm:mb-3 z-20 px-2 ${className}`}>
-      {/* Precision Laser Gate Telemetry Capsule - Compact, Non-wrapping Single-Row Hub */}
-      <div className="inline-flex items-center justify-center flex-nowrap bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200/90 dark:border-slate-800/90 rounded-2xl px-2 sm:px-3 py-1.5 shadow-sm dark:shadow-xl gap-1 sm:gap-2 select-none transition-all max-w-full overflow-x-auto scrollbar-none">
+    <div className={`w-full flex justify-center mb-2 sm:mb-3 z-20 px-2 select-none ${className}`}>
+      {/* Precision Laser Gate Telemetry Capsule */}
+      <div className="inline-flex items-center justify-center flex-nowrap bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200/90 dark:border-slate-800/90 rounded-2xl px-2.5 sm:px-3 py-1.5 shadow-sm dark:shadow-xl gap-1 sm:gap-2 max-w-full overflow-x-auto scrollbar-none">
         
-        {/* POD 1: START GATE (START LASER • 0M) */}
-        <button
+        {/* POD 1: START GATE (0m) */}
+        <motion.button
+          whileHover={{ y: -1 }}
+          whileTap={{ scale: 0.94 }}
+          transition={{ type: "spring", stiffness: 400, damping: 25 }}
           type="button"
           onClick={handleOpenHub}
           title={`Start Gate (0m) ${nodeA ? `[${nodeA}]` : ''} — ${isNodeAOnline ? (isNodeABlocked ? 'BEAM BLOCKED' : 'ONLINE') : 'OFFLINE'} • Click to open Hardware Hub`}
-          className="group flex flex-col items-center justify-center px-1.5 sm:px-2 py-0.5 rounded-xl hover:bg-slate-100/80 dark:hover:bg-slate-800/80 transition-all cursor-pointer focus:outline-none min-w-[56px] sm:min-w-[64px]"
+          className="group flex flex-col items-center justify-center px-1.5 sm:px-2 py-0.5 rounded-xl hover:bg-slate-100/80 dark:hover:bg-slate-800/80 transition-colors cursor-pointer focus:outline-none min-w-[56px] sm:min-w-[64px]"
         >
-          {/* Laser Emitter Pod Icon Above */}
+          {/* Laser Emitter Pod Icon */}
           <div className="relative flex items-center justify-center shrink-0">
-            <div className={`w-6 h-6 sm:w-7 sm:h-7 rounded-lg flex items-center justify-center transition-all ${
+            <div className={`w-6 h-6 sm:w-7 sm:h-7 rounded-lg flex items-center justify-center transition-colors ${
               isNodeAOnline
                 ? isNodeABlocked
                   ? 'bg-amber-500/15 border border-amber-500/40 text-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.35)]'
@@ -118,29 +119,41 @@ function GateTrafficLights({
               </span>
             </div>
           </div>
-        </button>
+        </motion.button>
 
-        {/* INTERCONNECTING LASER BEAM WAVEGUIDE */}
-        <div className="flex items-center px-0.5 sm:px-1 shrink-0">
-          <div className={`h-0.5 w-3 sm:w-6 rounded-full transition-all duration-300 relative ${
+        {/* INTERCONNECTING LASER BEAM WAVEGUIDE WITH STREAMING PHOTON PULSE */}
+        <div className="flex items-center px-0.5 sm:px-1 shrink-0 relative overflow-hidden">
+          <div className={`h-1 w-4 sm:w-8 rounded-full transition-all duration-300 relative overflow-hidden ${
             isGatesOnline
               ? isAnyBeamBlocked
-                ? 'bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.8)] animate-pulse'
-                : 'bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]'
+                ? 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.8)] animate-pulse'
+                : 'bg-emerald-500/30 shadow-[0_0_8px_rgba(16,185,129,0.4)]'
               : 'bg-slate-200 dark:bg-slate-800'
-          }`} />
+          }`}>
+            {isGatesOnline && !isAnyBeamBlocked && (
+              <motion.div
+                initial={{ x: "-100%" }}
+                animate={{ x: "100%" }}
+                transition={{ repeat: Infinity, duration: 1.2, ease: "linear" }}
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-300 to-transparent w-full h-full"
+              />
+            )}
+          </div>
         </div>
 
-        {/* POD 2: FINISH GATE (FINISH LASER • DISTANCE) */}
-        <button
+        {/* POD 2: FINISH GATE */}
+        <motion.button
+          whileHover={{ y: -1 }}
+          whileTap={{ scale: 0.94 }}
+          transition={{ type: "spring", stiffness: 400, damping: 25 }}
           type="button"
           onClick={handleOpenHub}
           title={`Finish Gate (${trackDistance || 40}m) ${nodeB ? `[${nodeB}]` : ''} — ${isNodeBOnline ? (isNodeBBlocked ? 'BEAM BLOCKED' : 'ONLINE') : statusB?.reconnecting ? `RETRYING (${statusB?.reconnectAttempts || 1})` : 'OFFLINE'} • Click to open Hardware Hub`}
-          className="group flex flex-col items-center justify-center px-1.5 sm:px-2 py-0.5 rounded-xl hover:bg-slate-100/80 dark:hover:bg-slate-800/80 transition-all cursor-pointer focus:outline-none min-w-[56px] sm:min-w-[64px]"
+          className="group flex flex-col items-center justify-center px-1.5 sm:px-2 py-0.5 rounded-xl hover:bg-slate-100/80 dark:hover:bg-slate-800/80 transition-colors cursor-pointer focus:outline-none min-w-[56px] sm:min-w-[64px]"
         >
-          {/* Laser Emitter Pod Icon Above */}
+          {/* Laser Emitter Pod Icon */}
           <div className="relative flex items-center justify-center shrink-0">
-            <div className={`w-6 h-6 sm:w-7 sm:h-7 rounded-lg flex items-center justify-center transition-all ${
+            <div className={`w-6 h-6 sm:w-7 sm:h-7 rounded-lg flex items-center justify-center transition-colors ${
               isNodeBOnline
                 ? isNodeBBlocked
                   ? 'bg-amber-500/15 border border-amber-500/40 text-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.35)]'
@@ -192,20 +205,23 @@ function GateTrafficLights({
               </span>
             </div>
           </div>
-        </button>
+        </motion.button>
 
         {/* Divider */}
         <div className="h-6 sm:h-7 w-px bg-slate-200 dark:bg-slate-800 shrink-0 mx-0.5" />
 
         {/* POD 3: GATE LINK TELEMETRY (MASTER SYNC) */}
-        <button
+        <motion.button
+          whileHover={{ y: -1 }}
+          whileTap={{ scale: 0.94 }}
+          transition={{ type: "spring", stiffness: 400, damping: 25 }}
           type="button"
           onClick={handleOpenHub}
           title={`Photocell Laser Link — ${isGatesOnline ? (isAnyBeamBlocked ? 'BEAM BLOCKED' : 'ALL GATES ARMED & READY') : 'GATES DISCONNECTED'} • Click to open Hardware Hub`}
-          className="group flex flex-col items-center justify-center px-1.5 sm:px-2 py-0.5 rounded-xl hover:bg-slate-100/80 dark:hover:bg-slate-800/80 transition-all cursor-pointer focus:outline-none min-w-[56px] sm:min-w-[64px]"
+          className="group flex flex-col items-center justify-center px-1.5 sm:px-2 py-0.5 rounded-xl hover:bg-slate-100/80 dark:hover:bg-slate-800/80 transition-colors cursor-pointer focus:outline-none min-w-[56px] sm:min-w-[64px]"
         >
-          {/* Gate Link Icon Above */}
-          <div className={`w-6 h-6 sm:w-7 sm:h-7 rounded-lg flex items-center justify-center transition-all shrink-0 ${
+          {/* Gate Link Icon */}
+          <div className={`w-6 h-6 sm:w-7 sm:h-7 rounded-lg flex items-center justify-center transition-colors shrink-0 ${
             isGatesOnline
               ? isAnyBeamBlocked
                 ? 'bg-amber-500/15 border border-amber-500/40 text-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.35)]'
@@ -219,87 +235,73 @@ function GateTrafficLights({
             )}
           </div>
 
-          {/* Names & Status Below */}
           <div className="flex flex-col items-center text-center mt-1 leading-tight">
             <span className="text-[9px] sm:text-[10px] font-mono font-black text-slate-700 dark:text-slate-200 tracking-wider whitespace-nowrap">
               GATE LINK
             </span>
-            <div className="flex items-center gap-1 mt-0.5 whitespace-nowrap">
-              <span className="text-[8px] font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-1 py-0.2 rounded font-bold">
-                ±1ms
-              </span>
-              <span className={`text-[8px] sm:text-[9px] font-mono font-extrabold uppercase tracking-wider ${
-                isGatesOnline
-                  ? isAnyBeamBlocked
-                    ? 'text-amber-500 animate-pulse'
-                    : 'text-emerald-500'
-                  : 'text-rose-500'
-              }`}>
-                {isGatesOnline ? (isAnyBeamBlocked ? 'BLOCKED' : 'ARMED') : 'OFFLINE'}
-              </span>
-            </div>
+            <span className={`text-[8px] sm:text-[9px] font-mono font-extrabold uppercase mt-0.5 tracking-wider whitespace-nowrap ${
+              isGatesOnline
+                ? isAnyBeamBlocked
+                  ? 'text-amber-500'
+                  : 'text-emerald-500'
+                : 'text-rose-500'
+            }`}>
+              {isGatesOnline ? (isAnyBeamBlocked ? 'BLOCKED' : 'ARMED') : 'OFFLINE'}
+            </span>
           </div>
-        </button>
+        </motion.button>
 
         {/* Divider */}
-        {onOpenConnectionModal && (
-          <div className="h-6 sm:h-7 w-px bg-slate-200 dark:bg-slate-800 shrink-0 mx-0.5" />
-        )}
+        <div className="h-6 sm:h-7 w-px bg-slate-200 dark:bg-slate-800 shrink-0 mx-0.5" />
 
-        {/* POD 4: HARDWARE CONNECTION & SETTINGS TRIGGER */}
-        {onOpenConnectionModal && (
-          <button
-            type="button"
-            onClick={onOpenConnectionModal}
-            title="Open SprintGate Connection & Hardware Settings Hub (Wi-Fi, USB-C, BLE)"
-            className="group flex flex-col items-center justify-center px-1.5 sm:px-2 py-0.5 rounded-xl hover:bg-slate-100/80 dark:hover:bg-slate-800/80 transition-all cursor-pointer focus:outline-none min-w-[56px] sm:min-w-[64px]"
-          >
-            {/* Settings Icon Above */}
-            <div className={`w-6 h-6 sm:w-7 sm:h-7 rounded-lg flex items-center justify-center transition-all shrink-0 ${
+        {/* POD 4: HARDWARE CONNECTION MODE (USB-C / BLE / WI-FI) */}
+        <motion.button
+          whileHover={{ y: -1 }}
+          whileTap={{ scale: 0.94 }}
+          transition={{ type: "spring", stiffness: 400, damping: 25 }}
+          type="button"
+          onClick={handleOpenHub}
+          title={`Active Connection: ${activeLinkMode.toUpperCase()} • Click to switch USB-C, BLE or Wi-Fi`}
+          className="group flex flex-col items-center justify-center px-1.5 sm:px-2 py-0.5 rounded-xl hover:bg-slate-100/80 dark:hover:bg-slate-800/80 transition-colors cursor-pointer focus:outline-none min-w-[56px] sm:min-w-[64px]"
+        >
+          {/* Active Mode Icon */}
+          <div className={`w-6 h-6 sm:w-7 sm:h-7 rounded-lg flex items-center justify-center transition-colors shrink-0 ${
+            activeLinkMode === 'usbc'
+              ? 'bg-purple-500/15 border border-purple-500/40 text-purple-400 shadow-[0_0_8px_rgba(168,85,247,0.35)]'
+              : activeLinkMode === 'ble'
+              ? 'bg-cyan-500/15 border border-cyan-500/40 text-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.35)]'
+              : activeLinkMode === 'wifi'
+              ? 'bg-emerald-500/15 border border-emerald-500/40 text-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.35)]'
+              : 'bg-slate-500/10 border border-slate-500/30 text-slate-400'
+          }`}>
+            {activeLinkMode === 'usbc' ? (
+              <Usb size={13} />
+            ) : activeLinkMode === 'ble' ? (
+              <Bluetooth size={13} />
+            ) : activeLinkMode === 'wifi' ? (
+              <Wifi size={13} />
+            ) : (
+              <Sliders size={13} />
+            )}
+          </div>
+
+          <div className="flex flex-col items-center text-center mt-1 leading-tight">
+            <span className="text-[9px] sm:text-[10px] font-mono font-black text-slate-700 dark:text-slate-200 tracking-wider whitespace-nowrap">
+              CHANNEL
+            </span>
+            <span className={`text-[8px] sm:text-[9px] font-mono font-extrabold uppercase mt-0.5 tracking-wider whitespace-nowrap ${
               activeLinkMode === 'usbc'
-                ? 'bg-emerald-500/15 border border-emerald-500/40 text-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.35)]'
+                ? 'text-purple-400'
                 : activeLinkMode === 'ble'
-                ? 'bg-sky-500/15 border border-sky-500/40 text-sky-500 shadow-[0_0_8px_rgba(14,165,233,0.35)]'
+                ? 'text-cyan-400'
                 : activeLinkMode === 'wifi'
-                ? 'bg-emerald-500/15 border border-emerald-500/40 text-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.35)]'
-                : 'bg-amber-500/15 border border-amber-500/40 text-amber-500 animate-pulse'
+                ? 'text-emerald-400'
+                : 'text-slate-400'
             }`}>
-              {activeLinkMode === 'usbc' ? (
-                <Usb size={13} className="text-emerald-500" />
-              ) : activeLinkMode === 'ble' ? (
-                <Bluetooth size={13} className="text-sky-500" />
-              ) : activeLinkMode === 'wifi' ? (
-                <Wifi size={13} className="text-emerald-500" />
-              ) : (
-                <Sliders size={13} className="text-amber-500" />
-              )}
-            </div>
-
-            {/* Names & Status Below */}
-            <div className="flex flex-col items-center text-center mt-1 leading-tight">
-              <span className="text-[9px] sm:text-[10px] font-mono font-black text-slate-700 dark:text-slate-200 tracking-wider whitespace-nowrap">
-                SETTINGS
-              </span>
-              <span className={`text-[8px] sm:text-[9px] font-mono font-extrabold uppercase mt-0.5 tracking-wider whitespace-nowrap ${
-                activeLinkMode === 'usbc'
-                  ? 'text-emerald-500'
-                  : activeLinkMode === 'ble'
-                  ? 'text-sky-500'
-                  : activeLinkMode === 'wifi'
-                  ? 'text-emerald-500'
-                  : 'text-amber-500 animate-pulse'
-              }`}>
-                {activeLinkMode === 'usbc'
-                  ? 'USB (0ms)'
-                  : activeLinkMode === 'ble'
-                  ? 'BLE'
-                  : activeLinkMode === 'wifi'
-                  ? 'WI-FI'
-                  : 'CONNECT'}
-              </span>
-            </div>
-          </button>
-        )}
+              {activeLinkMode === 'usbc' ? 'SERIAL' : activeLinkMode === 'ble' ? 'BLE' : activeLinkMode === 'wifi' ? 'WI-FI' : 'MANUAL'}
+            </span>
+          </div>
+        </motion.button>
 
       </div>
     </div>

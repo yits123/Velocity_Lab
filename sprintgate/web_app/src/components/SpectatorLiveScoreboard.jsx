@@ -16,6 +16,7 @@
  */
 
 import React, { useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { 
   Zap, Trophy, Clock, Users, ArrowRight, Activity, 
   Flame, Smartphone, RefreshCw, ChevronRight, Shield, 
@@ -650,51 +651,62 @@ export default function SpectatorLiveScoreboard({
                 No times recorded yet today. Sprints will show here as completed!
               </div>
             ) : (
-              top10.map((run, idx) => {
-                const isGold = idx === 0;
-                const isSilver = idx === 1;
-                const isBronze = idx === 2;
-                return (
-                  <div
-                    key={run.id || run.firebaseId || idx}
-                    className={`flex items-center justify-between p-3 rounded-xl border transition ${
-                      isGold 
-                        ? 'bg-amber-500/10 border-amber-500/30 text-white' 
-                        : isSilver 
-                        ? 'bg-slate-300/10 border-slate-300/30 text-white'
-                        : isBronze
-                        ? 'bg-orange-500/10 border-orange-500/30 text-white'
-                        : 'bg-slate-950/60 border-slate-800/80 text-slate-300'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-black ${
-                        isGold ? 'bg-amber-400 text-black' :
-                        isSilver ? 'bg-slate-300 text-black' :
-                        isBronze ? 'bg-orange-400 text-black' :
-                        'bg-slate-800 text-slate-400'
-                      }`}>
-                        #{idx + 1}
-                      </div>
-                      <div>
-                        <div className="text-[10px] text-slate-400 mt-0.5">
-                          {run.distance ? (String(run.distance).toLowerCase().includes('m') ? run.distance : `${run.distance}m Sprint`) : `${run.distanceMeters || totalMeters}m Sprint`}
-                          {run.velocity ? ` • ${parseFloat(run.velocity).toFixed(2)} m/s` : ''}
-                          {run.reactionTime && parseFloat(run.reactionTime) > 0 ? ` • RT ${(parseFloat(run.reactionTime) > 20 ? parseFloat(run.reactionTime) / 1000 : parseFloat(run.reactionTime)).toFixed(3)}s` : ''}
+              <AnimatePresence>
+                {top10.map((run, idx) => {
+                  const isGold = idx === 0;
+                  const isSilver = idx === 1;
+                  const isBronze = idx === 2;
+                  return (
+                    <motion.div
+                      layout
+                      initial={{ opacity: 0, y: 12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      transition={{ type: "spring", stiffness: 350, damping: 25 }}
+                      key={run.id || run.firebaseId || `${run.name}-${run.time}-${idx}`}
+                      className={`flex items-center justify-between p-3 rounded-xl border transition ${
+                        isGold 
+                          ? 'bg-amber-500/10 border-amber-500/30 text-white shadow-[0_0_15px_rgba(251,191,36,0.15)]' 
+                          : isSilver 
+                          ? 'bg-slate-300/10 border-slate-300/30 text-white'
+                          : isBronze
+                          ? 'bg-orange-500/10 border-orange-500/30 text-white'
+                          : 'bg-slate-950/60 border-slate-800/80 text-slate-300'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-black shadow-xs ${
+                          isGold ? 'bg-amber-400 text-black shadow-[0_0_10px_rgba(251,191,36,0.6)]' :
+                          isSilver ? 'bg-slate-300 text-black' :
+                          isBronze ? 'bg-orange-400 text-black' :
+                          'bg-slate-800 text-slate-400'
+                        }`}>
+                          #{idx + 1}
+                        </div>
+                        <div>
+                          <div className="text-sm font-bold text-white flex items-center gap-1.5">
+                            <span>{run.name}</span>
+                            {isGold && <span className="text-xs">👑</span>}
+                          </div>
+                          <div className="text-[10px] text-slate-400 mt-0.5">
+                            {run.distance ? (String(run.distance).toLowerCase().includes('m') ? run.distance : `${run.distance}m Sprint`) : `${run.distanceMeters || totalMeters}m Sprint`}
+                            {run.velocity ? ` • ${parseFloat(run.velocity).toFixed(2)} m/s` : ''}
+                            {run.reactionTime && parseFloat(run.reactionTime) > 0 ? ` • RT ${(parseFloat(run.reactionTime) > 20 ? parseFloat(run.reactionTime) / 1000 : parseFloat(run.reactionTime)).toFixed(3)}s` : ''}
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    <div className="text-right">
-                      <div className={`text-base font-black font-mono tracking-tight ${
-                        isGold ? 'text-amber-400' : isSilver ? 'text-slate-200' : isBronze ? 'text-orange-400' : 'text-emerald-400'
-                      }`}>
-                        {formatTimeVal(run.time)}s
+                      <div className="text-right">
+                        <div className={`text-base font-black font-mono tracking-tight ${
+                          isGold ? 'text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]' : isSilver ? 'text-slate-200' : isBronze ? 'text-orange-400' : 'text-emerald-400'
+                        }`}>
+                          {formatTimeVal(run.time)}s
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                );
-              })
+                    </motion.div>
+                  );
+                })}
+              </AnimatePresence>
             )}
           </div>
         ) : (
@@ -740,47 +752,55 @@ export default function SpectatorLiveScoreboard({
       </main>
 
       {/* TV-Style Lower-Thirds Broadcast Banner in Stadium Mode */}
-      {showBroadcastLowerThird && (isRunning || sequenceState === 'finished' || activeRunner) && (
-        <div className="fixed bottom-12 left-4 right-4 max-w-xl mx-auto bg-gradient-to-r from-slate-950/95 via-slate-900/90 to-slate-950/95 backdrop-blur-md border border-cyan-500/40 rounded-2xl p-3 sm:p-3.5 shadow-2xl z-40 flex items-center justify-between gap-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
-          <div className="flex items-center gap-3">
-            <div className="relative w-11 h-11 rounded-xl bg-gradient-to-br from-cyan-400 via-teal-400 to-emerald-400 text-black flex items-center justify-center font-black text-sm shadow-md border border-cyan-300/40 shrink-0">
-              {activeRunner?.name ? activeRunner.name.split(' ').map(n => n[0]).slice(0, 2).join('') : 'VL'}
-              <span className="absolute -bottom-1 -right-1 text-xs">{countryFlag}</span>
-            </div>
-            <div>
-              <div className="text-[10px] font-mono font-bold tracking-widest uppercase text-cyan-400 flex items-center gap-1.5">
-                <Activity size={12} />
-                <span>VELOCITY TELEMETRY HUD • {activeRunner?.bib ? `BIB #${activeRunner.bib}` : 'LANE 1'} • {activeCountry}</span>
+      <AnimatePresence>
+        {showBroadcastLowerThird && (isRunning || sequenceState === 'finished' || activeRunner) && (
+          <motion.div 
+            initial={{ y: 60, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 60, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 350, damping: 28 }}
+            className="fixed bottom-12 left-4 right-4 max-w-xl mx-auto bg-gradient-to-r from-slate-950/95 via-slate-900/90 to-slate-950/95 backdrop-blur-md border border-cyan-500/40 rounded-2xl p-3 sm:p-3.5 shadow-2xl z-40 flex items-center justify-between gap-3"
+          >
+            <div className="flex items-center gap-3">
+              <div className="relative w-11 h-11 rounded-xl bg-gradient-to-br from-cyan-400 via-teal-400 to-emerald-400 text-black flex items-center justify-center font-black text-sm shadow-md border border-cyan-300/40 shrink-0">
+                {activeRunner?.name ? activeRunner.name.split(' ').map(n => n[0]).slice(0, 2).join('') : 'VL'}
+                <span className="absolute -bottom-1 -right-1 text-xs">{countryFlag}</span>
               </div>
-              <div className="text-sm font-black text-white uppercase tracking-tight">
-                {activeRunner?.name || "Sprint Athlete"}
+              <div>
+                <div className="text-[10px] font-mono font-bold tracking-widest uppercase text-cyan-400 flex items-center gap-1.5">
+                  <Activity size={12} />
+                  <span>VELOCITY TELEMETRY HUD • {activeRunner?.bib ? `BIB #${activeRunner.bib}` : 'LANE 1'} • {activeCountry}</span>
+                </div>
+                <div className="text-sm font-black text-white uppercase tracking-tight">
+                  {activeRunner?.name || "Sprint Athlete"}
+                </div>
+                <div className="text-[10px] font-mono text-slate-300 flex items-center gap-2">
+                  <span className="text-emerald-400 font-bold">PB {activeRunner?.personalBest ? `${activeRunner.personalBest}s` : (topRecord ? `${formatTimeVal(topRecord.time)}s` : '--')}</span>
+                  <span className="text-slate-600">•</span>
+                  <span className="text-amber-300 font-bold">REC {topRecord ? `${formatTimeVal(topRecord.time)}s` : '--'}</span>
+                  <span className="text-slate-600">•</span>
+                  <span className="text-cyan-300 font-bold">{displayTime}s</span>
+                </div>
               </div>
-              <div className="text-[10px] font-mono text-slate-300 flex items-center gap-2">
-                <span className="text-emerald-400 font-bold">PB {activeRunner?.personalBest ? `${activeRunner.personalBest}s` : (topRecord ? `${formatTimeVal(topRecord.time)}s` : '--')}</span>
-                <span className="text-slate-600">•</span>
-                <span className="text-amber-300 font-bold">REC {topRecord ? `${formatTimeVal(topRecord.time)}s` : '--'}</span>
-                <span className="text-slate-600">•</span>
-                <span className="text-cyan-300 font-bold">{displayTime}s</span>
+            </div>
+            <div className="text-right border-l border-slate-800 pl-3 shrink-0">
+              <div className="text-[9px] font-mono font-bold text-slate-400 uppercase">RUNNER SPEED</div>
+              <div className="text-base sm:text-lg font-black font-mono text-cyan-300 tabular-nums leading-none">
+                {currentSpeed} <span className="text-[10px] text-slate-400 font-bold">m/s</span>
+              </div>
+              <div className="text-[10px] font-mono text-slate-400 mt-0.5">
+                {(parseFloat(currentSpeed) * 3.6).toFixed(1)} km/h
+              </div>
+              <div className="w-16 sm:w-20 bg-slate-800 rounded-full h-1 mt-1 overflow-hidden ml-auto">
+                <div 
+                  className="h-full bg-gradient-to-r from-cyan-400 to-emerald-400" 
+                  style={{ width: `${Math.min(100, (parseFloat(currentSpeed) / 12) * 100)}%` }}
+                />
               </div>
             </div>
-          </div>
-          <div className="text-right border-l border-slate-800 pl-3 shrink-0">
-            <div className="text-[9px] font-mono font-bold text-slate-400 uppercase">RUNNER SPEED</div>
-            <div className="text-base sm:text-lg font-black font-mono text-cyan-300 tabular-nums leading-none">
-              {currentSpeed} <span className="text-[10px] text-slate-400 font-bold">m/s</span>
-            </div>
-            <div className="text-[10px] font-mono text-slate-400 mt-0.5">
-              {(parseFloat(currentSpeed) * 3.6).toFixed(1)} km/h
-            </div>
-            <div className="w-16 sm:w-20 bg-slate-800 rounded-full h-1 mt-1 overflow-hidden ml-auto">
-              <div 
-                className="h-full bg-gradient-to-r from-cyan-400 to-emerald-400" 
-                style={{ width: `${Math.min(100, (parseFloat(currentSpeed) / 12) * 100)}%` }}
-              />
-            </div>
-          </div>
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Persistent Bottom Spectator Footer */}
       <footer className="fixed bottom-0 left-0 right-0 z-30 bg-slate-900/90 backdrop-blur-md border-t border-slate-800 px-4 py-2.5 flex items-center justify-between text-xs text-slate-400">

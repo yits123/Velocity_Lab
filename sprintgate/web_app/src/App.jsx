@@ -16,6 +16,7 @@
  */
 
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import Papa from 'papaparse';
 import { initializeApp } from "firebase/app";
 import { getFirestore, collection, addDoc, serverTimestamp, query, orderBy, getDocs, updateDoc, doc, onSnapshot, setDoc, deleteDoc, initializeFirestore, persistentLocalCache, persistentMultipleTabManager, CACHE_SIZE_UNLIMITED, getDoc, limit } from "firebase/firestore";
@@ -5936,7 +5937,10 @@ export default function App() {
 
                       <div className="flex flex-nowrap items-center justify-between gap-1.5 sm:gap-2.5 w-full">
                         {/* 1. START HORN / STARTER SOUND (IN START / LEFT) */}
-                        <button 
+                        <motion.button 
+                          whileHover={{ y: -1 }}
+                          whileTap={{ scale: 0.94 }}
+                          transition={{ type: "spring", stiffness: 400, damping: 25 }}
                           onClick={triggerConfiguredStarterSound}
                           className={`flex items-center justify-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2.5 sm:py-3.5 rounded-xl border-2 font-bold text-xs sm:text-sm transition shadow-sm shrink-0 cursor-pointer ${
                             (audioConfig?.starterSound === 'custom')
@@ -5964,10 +5968,13 @@ export default function App() {
                              (audioConfig?.starterSound === 'whistle') ? 'Whistle' : 
                              'Start Horn'}
                           </span>
-                        </button>
+                        </motion.button>
 
                         {/* 2. START SEQUENCE BUTTON (BELOW TIMER IN CENTER) */}
-                        <button 
+                        <motion.button 
+                          whileHover={sequenceState === 'idle' ? { y: -1.5, scale: 1.01 } : {}}
+                          whileTap={sequenceState === 'idle' ? { scale: 0.96 } : {}}
+                          transition={{ type: "spring", stiffness: 400, damping: 25 }}
                           onClick={handleArmAndStart}
                           className={`flex-1 flex items-center justify-center gap-1.5 sm:gap-2.5 px-3 sm:px-6 py-2.5 sm:py-3.5 rounded-xl font-bold transition shadow-[0_0_20px_rgba(0,208,132,0.15)] cursor-pointer min-w-0 ${
                             sequenceState !== 'idle'
@@ -5986,24 +5993,30 @@ export default function App() {
                                sequenceState !== 'idle' ? 'Sequence Active' : 'Spacebar to trigger'}
                             </div>
                           </div>
-                        </button>
+                        </motion.button>
 
                         {/* 3. RESET BUTTON */}
-                        <button 
+                        <motion.button 
+                          whileHover={{ y: -1 }}
+                          whileTap={{ scale: 0.94 }}
+                          transition={{ type: "spring", stiffness: 400, damping: 25 }}
                           onClick={handleReset} 
                           className="px-2.5 sm:px-4 py-2.5 sm:py-3.5 rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-500 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-bold text-xs sm:text-sm transition bg-white dark:bg-slate-800 shadow-sm shrink-0 cursor-pointer"
                         >
                           Reset
-                        </button>
+                        </motion.button>
 
                         {/* 4. AUDIO SETTINGS BUTTON (IN LAST) */}
-                        <button 
+                        <motion.button 
+                          whileHover={{ y: -1 }}
+                          whileTap={{ scale: 0.92 }}
+                          transition={{ type: "spring", stiffness: 400, damping: 25 }}
                           onClick={() => setShowAudioSettingsModal(true)}
                           className="px-2.5 sm:px-3 py-2.5 sm:py-3.5 rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-emerald-500/50 text-slate-500 hover:text-emerald-500 transition bg-white dark:bg-slate-800 shadow-sm flex items-center justify-center cursor-pointer shrink-0"
                           title="Audio & Starting Cadence Settings (Change Sound, Voice & Intervals)"
                         >
                           <Sliders size={16} />
-                        </button>
+                        </motion.button>
                       </div>
                   </div>
                 )}
@@ -6279,83 +6292,127 @@ export default function App() {
                           )}
                         </div>
                       </div>
-                      <div className="bg-white dark:bg-slate-800 border border-[#00D084]/30 rounded-2xl p-3.5 flex flex-col gap-2 shadow-xs">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-emerald-600/20 text-emerald-500 flex items-center justify-center font-bold text-base shrink-0">
-                            {queue[0].name.split(' ').map(n=>n[0]).join('').substring(0,2)}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="text-base font-bold text-gray-900 dark:text-gray-100 truncate">{queue[0].name}</div>
-                            <div className="text-xs font-medium text-gray-500 mt-0.5">Bib: {queue[0].bib || 'S1'} | Age: {queue[0].age || 20}</div>
-                          </div>
-                          <button
-                            onClick={() => setQueue(prev => prev.slice(1))}
-                            className="text-gray-400 hover:text-red-400 p-1 rounded-lg transition"
-                            title="Remove from queue"
-                          >
-                            <X size={15} />
-                          </button>
-                        </div>
-
-                        {queue[0].battery && Array.isArray(queue[0].battery) && (
-                          <div className="flex flex-wrap gap-1.5 pt-2 border-t border-gray-100 dark:border-slate-700/60">
-                            {queue[0].battery.map((b, idx) => {
-                              const isCurrent = b.testMode === testMode;
-                              return (
-                                <span
-                                  key={idx}
-                                  className={`text-[9px] font-mono px-2 py-0.5 rounded-full border ${
-                                    b.status === 'completed'
-                                      ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-400 font-bold'
-                                      : isCurrent
-                                        ? 'bg-amber-500/20 border-amber-500/50 text-amber-400 font-bold animate-pulse'
-                                        : 'bg-slate-800/80 border-slate-700 text-slate-400'
-                                  }`}
-                                >
-                                  {b.testMode === 'standard' ? 'Sprint' : b.testMode === 'shuttle' ? '4x10 Shuttle' : b.testMode === 'pro_agility' ? '5-10-5' : b.testMode === 'l_drill' ? 'L-Drill' : b.testMode === 'rsa' ? 'RSA' : b.testMode}: {
-                                    b.status === 'completed' ? `✅ ${b.time}s` : isCurrent ? '⚡ Ready' : '⏳ Queued'
-                                  }
-                                </span>
-                              );
-                            })}
-                          </div>
-                        )}
-                      </div>
-                      
-                      {queue.slice(1).map((runner, i) => (
-                        <div key={i} className="flex items-center gap-2.5 py-2 px-1.5 border-b border-gray-200 dark:border-slate-800 last:border-0 hover:bg-gray-50 dark:hover:bg-slate-800/40 rounded-xl transition">
-                          <div className="text-[11px] text-gray-500 font-bold w-4">{(i+2).toString().padStart(2, '0')}</div>
-                          <div className="w-7 h-7 rounded-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-600 dark:text-gray-400 flex items-center justify-center font-bold text-[11px] shrink-0">
-                            {runner.name.split(' ').map(n=>n[0]).join('').substring(0,2)}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="text-xs font-bold text-gray-700 dark:text-gray-300 truncate">{runner.name}</div>
-                            <div className="text-[10px] font-medium text-gray-500 flex items-center gap-2">
-                              <span>Bib #{runner.bib}</span>
-                              {runner.battery ? (
-                                <span className="text-[9px] text-emerald-400 font-mono font-bold">
-                                  {runner.battery.filter(b=>b.status==='completed').length}/{runner.battery.length} Tests
-                                </span>
-                              ) : (
-                                <button
-                                  onClick={() => enqueueAthleteForAllTests(runner, false)}
-                                  className="text-[9px] text-emerald-600 dark:text-emerald-400 hover:underline font-mono flex items-center gap-0.5"
-                                  title="Upgrade to all 5 tests"
-                                >
-                                  <Zap size={9} /> All Tests
-                                </button>
-                              )}
+                      <AnimatePresence mode="popLayout">
+                        <motion.div 
+                          layout
+                          initial={{ opacity: 0, scale: 0.95 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, x: -30 }}
+                          transition={{ type: "spring", stiffness: 350, damping: 25 }}
+                          key={queue[0].id || queue[0].bib || queue[0].name}
+                          className="bg-white dark:bg-slate-800 border-2 border-[#00D084]/50 rounded-2xl p-3.5 flex flex-col gap-2 shadow-md relative overflow-hidden"
+                        >
+                          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-emerald-500/10 via-transparent to-transparent pointer-events-none" />
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full bg-emerald-600/20 text-emerald-500 flex items-center justify-center font-bold text-base shrink-0 shadow-xs border border-emerald-500/30">
+                              {queue[0].name.split(' ').map(n=>n[0]).join('').substring(0,2)}
                             </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="text-base font-bold text-gray-900 dark:text-gray-100 truncate">{queue[0].name}</div>
+                              <div className="text-xs font-medium text-gray-500 mt-0.5">Bib: {queue[0].bib || 'S1'} | Age: {queue[0].age || 20}</div>
+                            </div>
+                            <motion.button
+                              whileHover={{ scale: 1.1 }}
+                              whileTap={{ scale: 0.9 }}
+                              onClick={() => setQueue(prev => prev.slice(1))}
+                              className="text-gray-400 hover:text-red-400 p-1.5 rounded-lg transition hover:bg-red-500/10 cursor-pointer"
+                              title="Remove from queue"
+                            >
+                              <X size={15} />
+                            </motion.button>
                           </div>
-                          <button
-                            onClick={() => setQueue(prev => prev.filter((_, idx) => idx !== i + 1))}
-                            className="text-gray-400 hover:text-red-400 p-1 rounded transition"
-                            title="Remove"
+
+                          {queue[0].battery && Array.isArray(queue[0].battery) && (
+                            <div className="flex flex-wrap gap-1.5 pt-2 border-t border-gray-100 dark:border-slate-700/60">
+                              {queue[0].battery.map((b, idx) => {
+                                const isCurrent = b.testMode === testMode;
+                                return (
+                                  <span
+                                    key={idx}
+                                    className={`text-[9px] font-mono px-2 py-0.5 rounded-full border ${
+                                      b.status === 'completed'
+                                        ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-400 font-bold'
+                                        : isCurrent
+                                          ? 'bg-amber-500/20 border-amber-500/50 text-amber-400 font-bold animate-pulse'
+                                          : 'bg-slate-800/80 border-slate-700 text-slate-400'
+                                    }`}
+                                  >
+                                    {b.testMode === 'standard' ? 'Sprint' : b.testMode === 'shuttle' ? '4x10 Shuttle' : b.testMode === 'pro_agility' ? '5-10-5' : b.testMode === 'l_drill' ? 'L-Drill' : b.testMode === 'rsa' ? 'RSA' : b.testMode}: {
+                                      b.status === 'completed' ? `✅ ${b.time}s` : isCurrent ? '⚡ Ready' : '⏳ Queued'
+                                    }
+                                  </span>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </motion.div>
+                        
+                        {queue.slice(1).map((runner, i) => (
+                          <motion.div 
+                            layout
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, x: 20 }}
+                            transition={{ type: "spring", stiffness: 350, damping: 25 }}
+                            key={runner.id || runner.bib || `${runner.name}-${i}`} 
+                            className="flex items-center gap-2.5 py-2 px-1.5 border-b border-gray-200 dark:border-slate-800 last:border-0 hover:bg-gray-50 dark:hover:bg-slate-800/40 rounded-xl transition"
                           >
-                            <X size={13} />
-                          </button>
-                        </div>
-                      ))}
+                            <div className="text-[11px] text-gray-500 font-bold w-4">{(i+2).toString().padStart(2, '0')}</div>
+                            <div className="w-7 h-7 rounded-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-600 dark:text-gray-400 flex items-center justify-center font-bold text-[11px] shrink-0">
+                              {runner.name.split(' ').map(n=>n[0]).join('').substring(0,2)}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="text-xs font-bold text-gray-700 dark:text-gray-300 truncate">{runner.name}</div>
+                              <div className="text-[10px] font-medium text-gray-500 flex items-center gap-2">
+                                <span>Bib #{runner.bib}</span>
+                                {runner.battery ? (
+                                  <span className="text-[9px] text-emerald-400 font-mono font-bold">
+                                    {runner.battery.filter(b=>b.status==='completed').length}/{runner.battery.length} Tests
+                                  </span>
+                                ) : (
+                                  <button
+                                    onClick={() => enqueueAthleteForAllTests(runner, false)}
+                                    className="text-[9px] text-emerald-600 dark:text-emerald-400 hover:underline font-mono flex items-center gap-0.5"
+                                    title="Upgrade to all 5 tests"
+                                  >
+                                    <Zap size={9} /> All Tests
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              {/* Reorder Up Button */}
+                              <motion.button
+                                whileHover={{ scale: 1.15 }}
+                                whileTap={{ scale: 0.9 }}
+                                onClick={() => {
+                                  setQueue(prev => {
+                                    const next = [...prev];
+                                    const targetIdx = i + 1;
+                                    const swap = next[targetIdx];
+                                    next[targetIdx] = next[targetIdx - 1];
+                                    next[targetIdx - 1] = swap;
+                                    return next;
+                                  });
+                                }}
+                                className="text-gray-400 hover:text-emerald-400 p-1 rounded transition hover:bg-slate-700/50 cursor-pointer"
+                                title="Move up in queue"
+                              >
+                                ▲
+                              </motion.button>
+                              <motion.button
+                                whileHover={{ scale: 1.15 }}
+                                whileTap={{ scale: 0.9 }}
+                                onClick={() => setQueue(prev => prev.filter((_, idx) => idx !== i + 1))}
+                                className="text-gray-400 hover:text-red-400 p-1 rounded transition hover:bg-red-500/10 cursor-pointer"
+                                title="Remove"
+                              >
+                                <X size={13} />
+                              </motion.button>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </AnimatePresence>
                     </>
                   )}
                 </div>

@@ -15,20 +15,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Gauge, Crosshair, Flame, Zap, ArrowUpRight } from 'lucide-react';
 import { useVirtualRunnerSync } from './VirtualSprinter';
 
 /**
  * CockpitHUD.jsx
- * High-performance athletic telemetry cockpit:
- * - 240° Calibrated Radial Tachometer (m/s, km/h, mph)
- * - 2D G-Force Friction Radar Reticle (Longitudinal drive & Lateral sway)
- * - 9-Segment Kinematic Shift Light Bar with dynamic redline alert
- * - Sprint Gear & Phase Pill (Blocks, Drive, Transition, Max V, Finish)
+ * High-performance athletic telemetry cockpit powered by Motion physics:
+ * - 240° Calibrated Radial Tachometer with critically-damped spring needle
+ * - 2D G-Force Friction Radar with decaying comet momentum trail
+ * - 9-Segment Kinematic Shift Light Bar with dynamic redline alert & scale bounce
+ * - Sprint Gear & Phase Pill with flip transitions
  * - 4-Tile Telemetry Matrix: Top Speed, Acceleration, G-Force, Horizontal Power
- * - Mode switcher: COMBO | DIAL | G-FORCE
- * - Flawless Light Mode & Dark Mode contrast
+ * - Mode switcher: COMBO | DIAL | G-FORCE with animated layout pill
+ * - Flawless Light Mode & Dark Mode contrast (WCAG AAA)
  */
 function CockpitHUD({
   trackDistance = '40',
@@ -234,6 +235,19 @@ function CockpitHUD({
     return { x: 70 + (dx / dist) * 54, y: 70 + (dy / dist) * 54 };
   }, [liveGLat, liveGLong]);
 
+  // G-Force Reticle Comet Trail Buffer (Last 4 points for motion blur trajectory)
+  const [gTrail, setGTrail] = useState([]);
+  useEffect(() => {
+    if (isSessionRunning) {
+      setGTrail(prev => {
+        const next = [...prev, gForcePoint];
+        return next.length > 5 ? next.slice(next.length - 5) : next;
+      });
+    } else {
+      setGTrail([]);
+    }
+  }, [gForcePoint, isSessionRunning]);
+
   const peakGRadius = useMemo(() => {
     return Math.min(54, Math.max(0, peakGForce * 45));
   }, [peakGForce]);
@@ -251,55 +265,42 @@ function CockpitHUD({
         </span>
 
         <div className="flex items-center gap-1 shrink-0">
-          {/* Mode Switcher: COMBO | DIAL | G-FORCE */}
-          <div className="bg-gray-100 dark:bg-slate-950/90 p-0.5 rounded-lg border border-gray-200 dark:border-slate-800 flex items-center gap-0.5 shadow-2xs">
-            <button
-              type="button"
-              onClick={() => setTachoMode('combo')}
-              className={`px-1.5 py-0.5 rounded text-[8px] font-bold uppercase transition ${
-                tachoMode === 'combo' 
-                  ? 'bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 border border-cyan-500/30 shadow-2xs' 
-                  : 'text-gray-400 hover:text-gray-700 dark:text-slate-500 dark:hover:text-slate-300'
-              }`}
-              title="Combo View: Speedometer + G-Force Reticle"
-            >
-              COMBO
-            </button>
-            <button
-              type="button"
-              onClick={() => setTachoMode('dial')}
-              className={`px-1.5 py-0.5 rounded text-[8px] font-bold uppercase transition ${
-                tachoMode === 'dial' 
-                  ? 'bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 border border-cyan-500/30 shadow-2xs' 
-                  : 'text-gray-400 hover:text-gray-700 dark:text-slate-500 dark:hover:text-slate-300'
-              }`}
-              title="Expanded Speedometer Dial"
-            >
-              DIAL
-            </button>
-            <button
-              type="button"
-              onClick={() => setTachoMode('gforce')}
-              className={`px-1.5 py-0.5 rounded text-[8px] font-bold uppercase transition ${
-                tachoMode === 'gforce' 
-                  ? 'bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 border border-cyan-500/30 shadow-2xs' 
-                  : 'text-gray-400 hover:text-gray-700 dark:text-slate-500 dark:hover:text-slate-300'
-              }`}
-              title="Expanded 2D G-Force Friction Radar"
-            >
-              G-FORCE
-            </button>
+          {/* Animated Mode Switcher: COMBO | DIAL | G-FORCE */}
+          <div className="bg-gray-100 dark:bg-slate-950/90 p-0.5 rounded-lg border border-gray-200 dark:border-slate-800 flex items-center gap-0.5 shadow-2xs relative">
+            {['combo', 'dial', 'gforce'].map((mode) => (
+              <button
+                key={mode}
+                type="button"
+                onClick={() => setTachoMode(mode)}
+                className={`relative px-1.5 py-0.5 rounded text-[8px] font-bold uppercase transition z-10 ${
+                  tachoMode === mode 
+                    ? 'text-cyan-700 dark:text-cyan-300 font-extrabold' 
+                    : 'text-gray-400 hover:text-gray-700 dark:text-slate-500 dark:hover:text-slate-300'
+                }`}
+                title={`Switch to ${mode.toUpperCase()} view`}
+              >
+                {tachoMode === mode && (
+                  <motion.div
+                    layoutId="cockpitModePill"
+                    transition={{ type: "spring", stiffness: 450, damping: 30 }}
+                    className="absolute inset-0 bg-cyan-500/20 border border-cyan-500/40 rounded shadow-xs -z-10"
+                  />
+                )}
+                {mode === 'combo' ? 'COMBO' : mode === 'dial' ? 'DIAL' : 'G-FORCE'}
+              </button>
+            ))}
           </div>
 
-          {/* Speed Unit Toggle */}
-          <button 
+          {/* Speed Unit Toggle with micro-scale feedback */}
+          <motion.button 
+            whileTap={{ scale: 0.92 }}
             type="button"
             onClick={() => setSpeedUnit(prev => prev === 'ms' ? 'kmh' : prev === 'kmh' ? 'mph' : 'ms')}
-            className="bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 px-1.5 py-0.5 rounded-md text-[9px] text-cyan-600 dark:text-cyan-300 border border-gray-200 dark:border-slate-700 font-extrabold transition uppercase shadow-2xs"
+            className="bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 px-1.5 py-0.5 rounded-md text-[9px] text-cyan-600 dark:text-cyan-300 border border-gray-200 dark:border-slate-700 font-extrabold transition uppercase shadow-2xs cursor-pointer"
             title="Toggle Speed Units (m/s, km/h, mph)"
           >
             {speedUnit === 'ms' ? 'm/s' : speedUnit === 'kmh' ? 'km/h' : 'mph'}
-          </button>
+          </motion.button>
         </div>
       </div>
 
@@ -314,31 +315,51 @@ function CockpitHUD({
             if (i === 8) ledColor = 'bg-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.95)]';
 
             return (
-              <div
+              <motion.div
                 key={i}
-                className={`h-1.5 flex-1 rounded-xs transition-all duration-75 ${
+                initial={false}
+                animate={{
+                  scaleY: isActive ? (isRedline && i >= 6 ? [1, 1.35, 1] : 1.15) : 1,
+                  opacity: isActive ? 1 : isDark ? 0.25 : 0.45
+                }}
+                transition={{ duration: 0.15 }}
+                className={`h-1.5 flex-1 rounded-xs transition-colors duration-100 ${
                   isActive 
-                    ? isRedline && i >= 6 ? `${ledColor} animate-pulse` : ledColor 
-                    : isDark ? 'bg-slate-800/80 opacity-30' : 'bg-gray-200 opacity-60'
+                    ? ledColor 
+                    : isDark ? 'bg-slate-800/80' : 'bg-gray-200'
                 }`}
               />
             );
           })}
         </div>
 
-        {/* Sprint Gear & Phase Pill */}
+        {/* Sprint Gear & Phase Pill with flip animation */}
         <div className="w-full flex justify-between items-center px-0.5">
-          <div className={`px-2 py-0.5 rounded-md border text-[9px] font-mono font-black flex items-center gap-1.5 ${sprintPhase.bg}`}>
-            <span className="w-1.5 h-1.5 rounded-full bg-current animate-ping" />
-            <span className="tracking-wider">GEAR {sprintPhase.gear}</span>
-            <span className="text-gray-400 dark:text-slate-500">|</span>
-            <span className="uppercase">{sprintPhase.label}</span>
-          </div>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={sprintPhase.gear}
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 4 }}
+              transition={{ duration: 0.15 }}
+              className={`px-2 py-0.5 rounded-md border text-[9px] font-mono font-black flex items-center gap-1.5 ${sprintPhase.bg}`}
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-current animate-ping" />
+              <span className="tracking-wider">GEAR {sprintPhase.gear}</span>
+              <span className="text-gray-400 dark:text-slate-500">|</span>
+              <span className="uppercase">{sprintPhase.label}</span>
+            </motion.div>
+          </AnimatePresence>
 
           {isRedline ? (
-            <span className="px-1.5 py-0.5 rounded bg-rose-500/20 border border-rose-500/60 text-rose-600 dark:text-rose-300 text-[8px] font-black font-mono tracking-wider animate-pulse flex items-center gap-1">
+            <motion.span 
+              initial={{ scale: 0.9 }}
+              animate={{ scale: [0.95, 1.05, 0.95] }}
+              transition={{ repeat: Infinity, duration: 0.4 }}
+              className="px-1.5 py-0.5 rounded bg-rose-500/20 border border-rose-500/60 text-rose-600 dark:text-rose-300 text-[8px] font-black font-mono tracking-wider flex items-center gap-1 shadow-[0_0_10px_rgba(244,63,94,0.35)]"
+            >
               <Flame size={9} className="text-rose-500 dark:text-rose-400" /> REDLINE
-            </span>
+            </motion.span>
           ) : (
             <span className="text-[8px] font-mono text-gray-500 dark:text-slate-400">
               {(timeNum).toFixed(2)}s ELAPSED
@@ -353,7 +374,7 @@ function CockpitHUD({
         {/* MODE 1: COMBO (Tachometer Arc + Mini G-Force Friction Radar) */}
         {tachoMode === 'combo' && (
           <div className="w-full flex flex-col items-center gap-2">
-            {/* Tachometer Arc */}
+            {/* Tachometer Arc with Spring-Damped Needle */}
             <div className="relative w-44 sm:w-48 h-28 flex items-center justify-center">
               <svg className="w-full h-full overflow-visible" viewBox="0 0 160 105">
                 <defs>
@@ -420,19 +441,28 @@ function CockpitHUD({
 
                 {/* Peak Velocity Needle Marker */}
                 {peakVelocity > 0 && (
-                  <g transform={`rotate(${peakNeedleDeg} 80 75)`}>
+                  <motion.g 
+                    animate={{ rotate: peakNeedleDeg }}
+                    transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                    transformOrigin="80px 75px"
+                  >
                     <line x1="80" y1="75" x2="80" y2="24" stroke="#f59e0b" strokeWidth="2.2" strokeDasharray="3 3" opacity="0.9" />
                     <circle cx="80" cy="23" r="3.2" fill="#f59e0b" filter="url(#hudNeedleGlowCombo)" />
                     <polygon points="77,20 83,20 80,15" fill="#f59e0b" />
-                  </g>
+                  </motion.g>
                 )}
 
-                {/* Active Speed Needle */}
-                <g transform={`rotate(${needleDeg} 80 75)`} className="transition-transform duration-75 ease-out" filter="url(#hudNeedleGlowCombo)">
+                {/* Spring-Damped Active Speed Needle */}
+                <motion.g 
+                  animate={{ rotate: needleDeg }} 
+                  transition={{ type: "spring", stiffness: 220, damping: 18, mass: 0.6 }}
+                  transformOrigin="80px 75px"
+                  filter="url(#hudNeedleGlowCombo)"
+                >
                   <line x1="80" y1="75" x2="80" y2="26" stroke={isDark ? "#ffffff" : "#0f172a"} strokeWidth="3" strokeLinecap="round" />
                   <circle cx="80" cy="75" r="6" fill="#0284c7" />
                   <circle cx="80" cy="75" r="2.5" fill="#ffffff" />
-                </g>
+                </motion.g>
 
                 {/* Perimeter Dial Labels */}
                 <text x="32" y="104" fill={isDark ? "#64748b" : "#94a3b8"} fontSize="8" fontWeight="bold" textAnchor="middle">0</text>
@@ -449,31 +479,53 @@ function CockpitHUD({
                    speedUnit === 'mph' ? currentMph.toFixed(1) : 
                    currentVelocity.toFixed(2)}
                 </span>
-                <span className="text-[10px] font-mono font-extrabold text-cyan-600 dark:text-cyan-400 uppercase mt-0.5 tracking-wider">
-                  {speedUnit === 'kmh' ? 'km/h' : speedUnit === 'mph' ? 'mph' : 'm/s'}
+                <span className="text-[9px] font-mono font-bold text-cyan-600 dark:text-cyan-400 uppercase mt-0.5">
+                  {speedUnit === 'kmh' ? 'KM/H' : speedUnit === 'mph' ? 'MPH' : 'M/S'}
                 </span>
               </div>
             </div>
 
-            {/* Mini G-Force Friction Radar Reticle */}
-            <div className="w-full bg-gray-50/80 dark:bg-slate-950/70 border border-gray-200/90 dark:border-slate-800/80 rounded-2xl p-1.5 sm:p-2 flex items-center justify-between gap-2 shadow-2xs overflow-hidden">
-              {/* Reticle Circle */}
-              <div className="relative w-14 h-14 sm:w-16 sm:h-16 flex-shrink-0 flex items-center justify-center">
-                <svg className="w-full h-full overflow-visible" viewBox="0 0 140 140">
-                  <circle cx="70" cy="70" r="54" fill="none" stroke={isDark ? "#1e293b" : "#e2e8f0"} strokeWidth="1.5" />
-                  <circle cx="70" cy="70" r="36" fill="none" stroke={isDark ? "#334155" : "#cbd5e1"} strokeWidth="1" strokeDasharray="3 3" />
-                  <circle cx="70" cy="70" r="18" fill="none" stroke={isDark ? "#1e293b" : "#e2e8f0"} strokeWidth="1" />
+            {/* Mini G-Force Friction Radar Reticle with Comet Trail */}
+            <div className="w-full flex items-center justify-between px-1 sm:px-2 pt-1 border-t border-gray-100 dark:border-slate-800/80 gap-2">
+              <div className="relative w-16 h-16 shrink-0 flex items-center justify-center">
+                <svg className="w-full h-full overflow-visible" viewBox="15 15 110 110">
+                  <circle cx="70" cy="70" r="50" fill={isDark ? "#020617" : "#f8fafc"} stroke={isDark ? "#334155" : "#cbd5e1"} strokeWidth="1" />
+                  <circle cx="70" cy="70" r="33" fill="none" stroke={isDark ? "#1e293b" : "#e2e8f0"} strokeWidth="1" strokeDasharray="2 2" />
+                  <circle cx="70" cy="70" r="16" fill="none" stroke={isDark ? "#1e293b" : "#e2e8f0"} strokeWidth="1" strokeDasharray="2 2" />
+                  <line x1="70" y1="20" x2="70" y2="120" stroke={isDark ? "#1e293b" : "#e2e8f0"} strokeWidth="1" />
+                  <line x1="20" y1="70" x2="120" y2="70" stroke={isDark ? "#1e293b" : "#e2e8f0"} strokeWidth="1" />
                   
-                  <line x1="16" y1="70" x2="124" y2="70" stroke={isDark ? "#334155" : "#cbd5e1"} strokeWidth="1" strokeDasharray="2 2" />
-                  <line x1="70" y1="16" x2="70" y2="124" stroke={isDark ? "#334155" : "#cbd5e1"} strokeWidth="1" strokeDasharray="2 2" />
-                  
-                  {peakGForce > 0.1 && (
-                    <circle cx="70" cy="70" r={peakGRadius} fill="none" stroke="#f59e0b" strokeWidth="1.2" strokeDasharray="2 2" opacity="0.8" />
+                  {/* Peak G-Force Hold Perimeter */}
+                  {peakGRadius > 0 && (
+                    <circle cx="70" cy="70" r={peakGRadius} fill="none" stroke="#f59e0b" strokeWidth="1.2" strokeDasharray="3 3" opacity="0.65" />
                   )}
 
-                  <line x1="70" y1="70" x2={gForcePoint.x} y2={gForcePoint.y} stroke="#06b6d4" strokeWidth="2" strokeLinecap="round" opacity="0.85" />
-                  <circle cx={gForcePoint.x} cy={gForcePoint.y} r="4.5" fill="#06b6d4" />
-                  <circle cx={gForcePoint.x} cy={gForcePoint.y} r="2" fill="#ffffff" />
+                  {/* Decaying Comet Trail */}
+                  {gTrail.map((pt, idx) => (
+                    <circle
+                      key={idx}
+                      cx={pt.x}
+                      cy={pt.y}
+                      r={(idx + 1) * 0.7}
+                      fill="#06b6d4"
+                      opacity={(idx + 1) * 0.16}
+                    />
+                  ))}
+
+                  {/* Active G-Force Position with Spring Physics */}
+                  <motion.circle 
+                    animate={{ cx: gForcePoint.x, cy: gForcePoint.y }}
+                    transition={{ type: "spring", stiffness: 350, damping: 24 }}
+                    r="4.5" 
+                    fill="#06b6d4" 
+                    filter="url(#hudNeedleGlowCombo)" 
+                  />
+                  <motion.circle 
+                    animate={{ cx: gForcePoint.x, cy: gForcePoint.y }}
+                    transition={{ type: "spring", stiffness: 350, damping: 24 }}
+                    r="1.8" 
+                    fill="#ffffff" 
+                  />
                 </svg>
               </div>
 
@@ -502,7 +554,7 @@ function CockpitHUD({
           </div>
         )}
 
-        {/* MODE 2: DIAL FOCUS */}
+        {/* MODE 2: DIAL FOCUS (Maximized Tachometer) */}
         {tachoMode === 'dial' && (
           <div className="w-full flex flex-col items-center">
             <div className="relative w-44 sm:w-52 h-32 sm:h-36 flex items-center justify-center">
@@ -558,26 +610,32 @@ function CockpitHUD({
                 ))}
 
                 {peakVelocity > 0 && (
-                  <g transform={`rotate(${peakNeedleDeg} 80 75)`}>
-                    <line x1="80" y1="75" x2="80" y2="23" stroke="#f59e0b" strokeWidth="2.5" strokeDasharray="3 3" opacity="0.9" />
-                    <circle cx="80" cy="22" r="3.5" fill="#f59e0b" />
-                    <polygon points="76,19 84,19 80,14" fill="#f59e0b" />
-                  </g>
+                  <motion.g 
+                    animate={{ rotate: peakNeedleDeg }}
+                    transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                    transformOrigin="80px 75px"
+                  >
+                    <line x1="80" y1="75" x2="80" y2="22" stroke="#f59e0b" strokeWidth="2.5" strokeDasharray="3 3" opacity="0.9" />
+                    <circle cx="80" cy="21" r="3.5" fill="#f59e0b" />
+                  </motion.g>
                 )}
 
-                <g transform={`rotate(${needleDeg} 80 75)`} className="transition-transform duration-75 ease-out">
-                  <line x1="80" y1="75" x2="80" y2="25" stroke={isDark ? "#ffffff" : "#0f172a"} strokeWidth="3.4" strokeLinecap="round" />
+                {/* Spring-Damped Active Needle */}
+                <motion.g 
+                  animate={{ rotate: needleDeg }} 
+                  transition={{ type: "spring", stiffness: 220, damping: 18, mass: 0.6 }}
+                  transformOrigin="80px 75px"
+                >
+                  <line x1="80" y1="75" x2="80" y2="24" stroke={isDark ? "#ffffff" : "#0f172a"} strokeWidth="3.5" strokeLinecap="round" />
                   <circle cx="80" cy="75" r="7" fill="#0284c7" />
                   <circle cx="80" cy="75" r="3" fill="#ffffff" />
-                </g>
+                </motion.g>
 
-                <text x="28" y="108" fill={isDark ? "#64748b" : "#64748b"} fontSize="8.5" fontWeight="bold" textAnchor="middle">0</text>
-                <text x="32" y="78" fill={isDark ? "#64748b" : "#64748b"} fontSize="8.5" fontWeight="bold" textAnchor="middle">2</text>
-                <text x="45" y="48" fill={isDark ? "#64748b" : "#64748b"} fontSize="8.5" fontWeight="bold" textAnchor="middle">4</text>
-                <text x="62" y="27" fill={isDark ? "#64748b" : "#64748b"} fontSize="8.5" fontWeight="bold" textAnchor="middle">6</text>
-                <text x="98" y="27" fill={isDark ? "#64748b" : "#64748b"} fontSize="8.5" fontWeight="bold" textAnchor="middle">8</text>
-                <text x="116" y="48" fill={isDark ? "#64748b" : "#64748b"} fontSize="8.5" fontWeight="bold" textAnchor="middle">10</text>
-                <text x="132" y="108" fill="#f43f5e" fontSize="8.5" fontWeight="bold" textAnchor="middle">12+</text>
+                <text x="32" y="106" fill={isDark ? "#64748b" : "#94a3b8"} fontSize="9" fontWeight="bold" textAnchor="middle">0</text>
+                <text x="44" y="52" fill={isDark ? "#64748b" : "#94a3b8"} fontSize="9" fontWeight="bold" textAnchor="middle">4</text>
+                <text x="80" y="18" fill={isDark ? "#64748b" : "#94a3b8"} fontSize="9" fontWeight="bold" textAnchor="middle">6</text>
+                <text x="116" y="52" fill={isDark ? "#64748b" : "#94a3b8"} fontSize="9" fontWeight="bold" textAnchor="middle">10</text>
+                <text x="128" y="106" fill="#f43f5e" fontSize="9" fontWeight="bold" textAnchor="middle">12</text>
               </svg>
 
               <div className="absolute bottom-1 flex flex-col items-center pointer-events-none">
@@ -586,46 +644,63 @@ function CockpitHUD({
                    speedUnit === 'mph' ? currentMph.toFixed(1) : 
                    currentVelocity.toFixed(2)}
                 </span>
-                <span className="text-[11px] font-mono font-extrabold text-cyan-600 dark:text-cyan-400 uppercase mt-0.5 tracking-wider">
-                  {speedUnit === 'kmh' ? 'km/h' : speedUnit === 'mph' ? 'mph' : 'm/s'}
+                <span className="text-[10px] font-mono font-bold text-cyan-600 dark:text-cyan-400 uppercase mt-0.5">
+                  {speedUnit === 'kmh' ? 'KM/H' : speedUnit === 'mph' ? 'MPH' : 'M/S'}
                 </span>
               </div>
             </div>
           </div>
         )}
 
-        {/* MODE 3: G-FORCE FOCUS */}
+        {/* MODE 3: G-FORCE FOCUS (Maximized Radar) */}
         {tachoMode === 'gforce' && (
           <div className="w-full flex flex-col items-center">
-            <div className="relative w-32 sm:w-38 h-32 sm:h-38 flex items-center justify-center">
+            <div className="relative w-40 sm:w-44 h-40 sm:h-44 flex items-center justify-center">
               <svg className="w-full h-full overflow-visible" viewBox="0 0 160 160">
-                <circle cx="80" cy="80" r="68" fill={isDark ? "#020617" : "#f8fafc"} stroke={isDark ? "#1e293b" : "#cbd5e1"} strokeWidth="2" />
-                <circle cx="80" cy="80" r="54" fill="none" stroke={isDark ? "#334155" : "#94a3b8"} strokeWidth="1.2" strokeDasharray="3 3" />
-                <circle cx="80" cy="80" r="36" fill="none" stroke={isDark ? "#334155" : "#94a3b8"} strokeWidth="1" />
-                <circle cx="80" cy="80" r="18" fill="none" stroke={isDark ? "#1e293b" : "#cbd5e1"} strokeWidth="1" />
+                <circle cx="80" cy="80" r="70" fill={isDark ? "#020617" : "#f8fafc"} stroke={isDark ? "#334155" : "#cbd5e1"} strokeWidth="1.2" />
+                <circle cx="80" cy="80" r="46" fill="none" stroke={isDark ? "#1e293b" : "#e2e8f0"} strokeWidth="1" strokeDasharray="3 3" />
+                <circle cx="80" cy="80" r="23" fill="none" stroke={isDark ? "#1e293b" : "#e2e8f0"} strokeWidth="1" strokeDasharray="3 3" />
+                <line x1="80" y1="10" x2="80" y2="150" stroke={isDark ? "#1e293b" : "#e2e8f0"} strokeWidth="1.2" />
+                <line x1="10" y1="80" x2="150" y2="80" stroke={isDark ? "#1e293b" : "#e2e8f0"} strokeWidth="1.2" />
 
-                <line x1="12" y1="80" x2="148" y2="80" stroke={isDark ? "#475569" : "#94a3b8"} strokeWidth="1" strokeDasharray="2 2" />
-                <line x1="80" y1="12" x2="80" y2="148" stroke={isDark ? "#475569" : "#94a3b8"} strokeWidth="1" strokeDasharray="2 2" />
+                {/* Concentric labels */}
+                <text x="83" y="22" fill={isDark ? "#475569" : "#94a3b8"} fontSize="8" fontFamily="monospace">+1.0G</text>
+                <text x="83" y="44" fill={isDark ? "#475569" : "#94a3b8"} fontSize="8" fontFamily="monospace">+0.5G</text>
+                <text x="83" y="125" fill={isDark ? "#475569" : "#94a3b8"} fontSize="8" fontFamily="monospace">-0.5G</text>
 
-                <line 
-                  x1="80" 
-                  y1="80" 
-                  x2={80 + (liveGLat * 45)} 
-                  y2={80 - (liveGLong * 45)} 
-                  stroke="#06b6d4" 
-                  strokeWidth="2.5" 
-                  strokeLinecap="round" 
-                />
+                {/* Peak G circle */}
+                {peakGForce > 0 && (
+                  <circle cx="80" cy="80" r={Math.min(70, peakGForce * 45)} fill="none" stroke="#f59e0b" strokeWidth="1.5" strokeDasharray="4 4" opacity="0.75" />
+                )}
 
-                <circle 
-                  cx={80 + (liveGLat * 45)} 
-                  cy={80 - (liveGLong * 45)} 
+                {/* Comet Trail */}
+                {gTrail.map((pt, idx) => (
+                  <circle
+                    key={idx}
+                    cx={80 + ((pt.x - 70) * 1.15)}
+                    cy={80 + ((pt.y - 70) * 1.15)}
+                    r={(idx + 1) * 0.9}
+                    fill="#06b6d4"
+                    opacity={(idx + 1) * 0.16}
+                  />
+                ))}
+
+                {/* Active G point with spring physics */}
+                <motion.circle 
+                  animate={{ 
+                    cx: 80 + (liveGLat * 45),
+                    cy: 80 - (liveGLong * 45)
+                  }}
+                  transition={{ type: "spring", stiffness: 350, damping: 24 }}
                   r="6" 
                   fill="#06b6d4" 
                 />
-                <circle 
-                  cx={80 + (liveGLat * 45)} 
-                  cy={80 - (liveGLong * 45)} 
+                <motion.circle 
+                  animate={{ 
+                    cx: 80 + (liveGLat * 45),
+                    cy: 80 - (liveGLong * 45)
+                  }}
+                  transition={{ type: "spring", stiffness: 350, damping: 24 }}
                   r="2.5" 
                   fill="#ffffff" 
                 />
@@ -656,10 +731,14 @@ function CockpitHUD({
 
       </div>
 
-      {/* 4-BOX TELEMETRY MATRIX */}
+      {/* 4-BOX TELEMETRY MATRIX WITH INTERACTIVE HOVER */}
       <div className="w-full grid grid-cols-2 gap-1.5 pt-2 border-t border-gray-100 dark:border-slate-800/80 text-[10px] font-mono z-10">
         {/* Box 1: Top Speed */}
-        <div className="bg-gray-50/80 dark:bg-slate-950/85 border border-gray-200/80 dark:border-slate-800/80 p-2 rounded-2xl flex flex-col items-center justify-center text-center shadow-2xs">
+        <motion.div 
+          whileHover={{ y: -2 }}
+          transition={{ type: "spring", stiffness: 400, damping: 25 }}
+          className="bg-gray-50/80 dark:bg-slate-950/85 border border-gray-200/80 dark:border-slate-800/80 p-2 rounded-2xl flex flex-col items-center justify-center text-center shadow-2xs"
+        >
           <span className="text-gray-500 dark:text-slate-400 block text-[8px] uppercase font-extrabold flex items-center gap-1">
             <Flame size={10} className="text-amber-500 dark:text-amber-400" /> TOP SPEED
           </span>
@@ -668,37 +747,49 @@ function CockpitHUD({
              speedUnit === 'mph' ? (peakVelocity * 2.23694).toFixed(1) : 
              peakVelocity.toFixed(2)} <span className="text-[8px] text-gray-400 dark:text-slate-400 font-sans">{speedUnit === 'kmh' ? 'km/h' : speedUnit === 'mph' ? 'mph' : 'm/s'}</span>
           </span>
-        </div>
+        </motion.div>
 
         {/* Box 2: Acceleration */}
-        <div className="bg-gray-50/80 dark:bg-slate-950/85 border border-gray-200/80 dark:border-slate-800/80 p-2 rounded-2xl flex flex-col items-center justify-center text-center shadow-2xs">
+        <motion.div 
+          whileHover={{ y: -2 }}
+          transition={{ type: "spring", stiffness: 400, damping: 25 }}
+          className="bg-gray-50/80 dark:bg-slate-950/85 border border-gray-200/80 dark:border-slate-800/80 p-2 rounded-2xl flex flex-col items-center justify-center text-center shadow-2xs"
+        >
           <span className="text-gray-500 dark:text-slate-400 block text-[8px] uppercase font-extrabold flex items-center gap-1">
             <ArrowUpRight size={10} className="text-emerald-500 dark:text-emerald-400" /> ACCELERATION
           </span>
           <span className="font-extrabold text-emerald-600 dark:text-emerald-400 text-xs sm:text-sm mt-0.5 tabular-nums">
             +{liveAcceleration.toFixed(1)} <span className="text-[8px] text-gray-400 dark:text-slate-400 font-sans">m/s²</span>
           </span>
-        </div>
+        </motion.div>
 
         {/* Box 3: G-Force */}
-        <div className="bg-gray-50/80 dark:bg-slate-950/85 border border-gray-200/80 dark:border-slate-800/80 p-2 rounded-2xl flex flex-col items-center justify-center text-center shadow-2xs">
+        <motion.div 
+          whileHover={{ y: -2 }}
+          transition={{ type: "spring", stiffness: 400, damping: 25 }}
+          className="bg-gray-50/80 dark:bg-slate-950/85 border border-gray-200/80 dark:border-slate-800/80 p-2 rounded-2xl flex flex-col items-center justify-center text-center shadow-2xs"
+        >
           <span className="text-gray-500 dark:text-slate-400 block text-[8px] uppercase font-extrabold flex items-center gap-1">
             <Crosshair size={10} className="text-cyan-600 dark:text-cyan-400" /> G-FORCE
           </span>
           <span className="font-extrabold text-cyan-600 dark:text-cyan-300 text-xs sm:text-sm mt-0.5 tabular-nums">
             {liveGTotal.toFixed(2)}G <span className="text-[8px] text-gray-400 dark:text-slate-500 font-sans">({peakGForce.toFixed(2)}G pk)</span>
           </span>
-        </div>
+        </motion.div>
 
         {/* Box 4: Horizontal Power */}
-        <div className="bg-gray-50/80 dark:bg-slate-950/85 border border-gray-200/80 dark:border-slate-800/80 p-2 rounded-2xl flex flex-col items-center justify-center text-center shadow-2xs">
+        <motion.div 
+          whileHover={{ y: -2 }}
+          transition={{ type: "spring", stiffness: 400, damping: 25 }}
+          className="bg-gray-50/80 dark:bg-slate-950/85 border border-gray-200/80 dark:border-slate-800/80 p-2 rounded-2xl flex flex-col items-center justify-center text-center shadow-2xs"
+        >
           <span className="text-gray-500 dark:text-slate-400 block text-[8px] uppercase font-extrabold flex items-center gap-1">
             <Zap size={10} className="text-purple-500 dark:text-purple-400" /> HORIZ POWER
           </span>
           <span className="font-extrabold text-purple-600 dark:text-purple-300 text-xs sm:text-sm mt-0.5 tabular-nums">
             {livePowerWkg.toFixed(1)} <span className="text-[8px] text-gray-400 dark:text-slate-400 font-sans">W/kg</span>
           </span>
-        </div>
+        </motion.div>
       </div>
 
     </div>
